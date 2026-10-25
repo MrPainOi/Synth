@@ -80,4 +80,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openLogsFolder: () => ipcRenderer.send('open-logs-folder'),
   getDiagnostics: () => ipcRenderer.invoke('get-diagnostics'),
   getAudioOutputInfo: () => ipcRenderer.invoke('get-audio-output-info'),
+  getRemoteStatus: () => ipcRenderer.invoke('remote-get-status'),
+  setRemoteEnabled: (enabled) => ipcRenderer.invoke('remote-set-enabled', enabled),
+  sendRemoteState: (state) => ipcRenderer.send('remote-state-from-renderer', state),
+  onRemoteCommand: (cb) => ipcRenderer.on('remote-command', (e, cmd) => cb(cmd)),
+  onRemoteStatusChanged: (cb) => ipcRenderer.on('remote-status-changed', (e, status) => cb(status)),
+  sendRemoteLibrary: (lib) => ipcRenderer.send('remote-library-from-renderer', lib),
+  onRemoteLibrarySync: (cb) => ipcRenderer.on('remote-library-sync', (e, lib) => cb(lib)),
 });
+
+

@@ -58,7 +58,7 @@
 
           meta = with pkgs.lib; {
             description = "Riff - audio player made for humans";
-            homepage = "https://github.com/rootscripts/riff";
+            homepage = "https://github.com/MrPainOi/Synth";
             license = licenses.mit;
             mainProgram = "riff";
             platforms = platforms.linux ++ platforms.darwin;

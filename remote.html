@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0e0f15">
+  <title>Riff Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --surface: rgba(22, 24, 32, 0.72);
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --primary: #9d6fff;
+      --primary-hover: #b18aff;
+      --primary-glow: rgba(157, 111, 255, 0.35);
+      --text: #f0f1f5;
+      --text-sub: #9496a6;
+      --text-muted: #626477;
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.3);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* Ambient dynamic glow */
+    .ambient-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .ambient-glow {
+      position: absolute;
+      width: 140vw;
+      height: 140vw;
+      top: -30vw;
+      left: -20vw;
+      background: radial-gradient(circle, var(--primary-glow) 0%, rgba(13, 14, 20, 0) 65%);
+      filter: blur(80px);
+      opacity: 0.65;
+      transition: opacity 1s ease, transform 1s ease;
+      transform: translateZ(0);
+    }
+    .ambient-glow-secondary {
+      position: absolute;
+      width: 100vw;
+      height: 100vw;
+      bottom: -30vw;
+      right: -20vw;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(13, 14, 20, 0) 70%);
+      filter: blur(70px);
+      pointer-events: none;
+    }
+
+    /* Main App Container */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      max-width: 440px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0 16px;
+    }
+    .device-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .header-btn {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: transform 0.15s, background 0.15s;
+      position: relative;
+    }
+    .header-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .queue-badge-count {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 17px;
+      height: 17px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* Album Artwork Section */
+    .art-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 0 24px;
+      flex: 1;
+      min-height: 240px;
+    }
+    .art-card {
+      width: min(76vw, 300px);
+      aspect-ratio: 1;
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
+      background: #181924;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 40px var(--primary-glow);
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.4s;
+    }
+    .art-card.playing {
+      transform: scale(1.02);
+    }
+    .art-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.3s;
+    }
+    .art-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      background: linear-gradient(135deg, #181a24 0%, #101118 100%);
+    }
+
+    /* Track Meta */
+    .track-meta {
+      text-align: center;
+      margin-bottom: 22px;
+      padding: 0 8px;
+    }
+    .track-title {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .track-artist {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-sub);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Scrubber Progress */
+    .scrubber-section {
+      margin-bottom: 24px;
+    }
+    .progress-bar-container {
+      position: relative;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      touch-action: none;
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #7c4dff, var(--primary));
+      border-radius: 999px;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+    .progress-thumb {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      transition: transform 0.1s;
+    }
+    .progress-bar-container:active .progress-thumb {
+      transform: translate(-50%, -50%) scale(1.25);
+    }
+    .time-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: -2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Player Controls */
+    .controls-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 0 8px;
+    }
+    .control-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-radius: 50%;
+      transition: color 0.15s, transform 0.15s, background 0.15s;
+    }
+    .control-btn:active {
+      transform: scale(0.9);
+      color: var(--text);
+    }
+    .control-btn.active {
+      color: var(--primary);
+    }
+    .control-btn.active svg {
+      filter: drop-shadow(0 0 8px var(--primary-glow));
+    }
+    .play-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45);
+      transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.15s;
+    }
+    .play-btn:active {
+      transform: scale(0.92);
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+    }
+
+    /* Volume Row */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .volume-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .volume-slider-box {
+      flex: 1;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      touch-action: none;
+      position: relative;
+    }
+    .volume-track {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+    }
+    .volume-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 85%;
+      background: var(--text);
+      border-radius: 999px;
+    }
+
+    /* Queue Drawer (Bottom Sheet) */
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 99;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sheet-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .queue-sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #14151e;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px 24px 0 0;
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transform: translateY(105%);
+      transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
+    }
+    .sheet-backdrop.open .queue-sheet {
+      transform: translateY(0);
+    }
+    .sheet-handle-bar {
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .sheet-handle {
+      width: 40px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+    }
+    .sheet-header {
+      padding: 4px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sheet-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .sheet-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--text-sub);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .queue-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 16px 30px;
+      list-style: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .queue-item:active {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .queue-item.active {
+      background: rgba(157, 111, 255, 0.15);
+      border: 1px solid rgba(157, 111, 255, 0.3);
+    }
+    .queue-item-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #242533;
+      flex-shrink: 0;
+    }
+    .queue-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .queue-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .queue-item.active .queue-item-title {
+      color: var(--primary);
+    }
+    .queue-item-artist {
+      font-size: 12px;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+    .queue-item-dur {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    /* Equalizer wave indicator */
+    .eq-wave {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+      margin-right: 6px;
+    }
+    .eq-bar {
+      width: 3px;
+      background: var(--primary);
+      border-radius: 999px;
+      animation: eqBounce 1s ease-in-out infinite alternate;
+    }
+    .eq-bar:nth-child(1) { height: 12px; animation-delay: 0.1s; }
+    .eq-bar:nth-child(2) { height: 6px; animation-delay: 0.3s; }
+    .eq-bar:nth-child(3) { height: 14px; animation-delay: 0.2s; }
+    @keyframes eqBounce {
+      0% { transform: scaleY(0.3); }
+      100% { transform: scaleY(1); }
+    }
+
+    /* PIN Pairing Modal */
+    .pin-modal {
+      position: fixed;
+      inset: 0;
+      background: #0b0c10;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .pin-modal.hidden {
+      display: none;
+    }
+    .pin-box {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    }
+    .pin-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .pin-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .pin-inputs {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .pin-digit {
+      width: 52px;
+      height: 60px;
+      border-radius: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .pin-digit:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+    .pin-submit-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+
+    /* Offline Toast */
+    .offline-toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #dc2626;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .offline-toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Dynamic Glow -->
+  <div class="ambient-backdrop">
+    <div class="ambient-glow" id="ambient-glow"></div>
+    <div class="ambient-glow-secondary"></div>
+  </div>
+
+  <!-- Offline Toast -->
+  <div class="offline-toast" id="offline-toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <span>Menghubungkan ke PC...</span>
+  </div>
+
+  <!-- PIN Pairing Modal -->
+  <div class="pin-modal hidden" id="pin-modal">
+    <div class="pin-box">
+      <div style="font-size: 36px; margin-bottom: 12px;">🎵</div>
+      <h2 class="pin-title">Hubungkan ke Riff</h2>
+      <p class="pin-desc">Masukkan 4 digit PIN yang tertera pada jendela Riff di layar PC Anda.</p>
+      <div class="pin-inputs">
+        <input type="tel" maxlength="1" class="pin-digit" id="d1" autofocus pattern="[0-9]*">
+        <input type="tel" maxlength="1" class="pin-digit" id="d2" pattern="[0-9]*">
+        <input type="tel" maxlength="1" class="pin-digit" id="d3" pattern="[0-9]*">
+        <input type="tel" maxlength="1" class="pin-digit" id="d4" pattern="[0-9]*">
+      </div>
+      <button class="pin-submit-btn" id="btn-submit-pin">Hubungkan</button>
+    </div>
+  </div>
+
+  <!-- Main Player Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="device-badge">
+        <span class="pulse-dot" id="status-pulse"></span>
+        <span id="device-label">PC Terhubung</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <a href="/Synth.apk" class="header-btn" title="Unduh APK Synth" style="text-decoration:none; color:var(--text-sub); display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600; padding:6px 10px; width:auto; border-radius:999px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>APK</span>
+        </a>
+        <button class="header-btn" id="btn-toggle-queue" title="Antrean Lagu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          <span class="queue-badge-count" id="queue-count">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Album Art -->
+    <div class="art-section">
+      <div class="art-card" id="art-card">
+        <img class="art-img" id="art-img" src="" alt="Album Art" style="display: none;">
+        <div class="art-fallback" id="art-fallback">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Track Info -->
+    <div class="track-meta">
+      <h1 class="track-title" id="track-title">Tidak ada lagu</h1>
+      <p class="track-artist" id="track-artist">Pilih lagu di Riff PC</p>
+    </div>
+
+    <!-- Scrubber Timeline -->
+    <div class="scrubber-section">
+      <div class="progress-bar-container" id="progress-container">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-thumb" id="progress-thumb"></div>
+      </div>
+      <div class="time-labels">
+        <span id="time-current">0:00</span>
+        <span id="time-duration">0:00</span>
+      </div>
+    </div>
+
+    <!-- Playback Controls -->
+    <div class="controls-main">
+      <button class="control-btn" id="btn-shuffle" title="Shuffle">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+      </button>
+
+      <button class="control-btn" id="btn-prev" title="Sebelumnya">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"></line></svg>
+      </button>
+
+      <button class="play-btn" id="btn-play-pause" title="Play / Pause">
+        <svg id="icon-play" width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"></polygon></svg>
+        <svg id="icon-pause" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1.5"></rect><rect x="14" y="4" width="4" height="16" rx="1.5"></rect></svg>
+      </button>
+
+      <button class="control-btn" id="btn-next" title="Selanjutnya">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"></line></svg>
+      </button>
+
+      <button class="control-btn" id="btn-repeat" title="Ulangi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+      </button>
+    </div>
+
+    <!-- Volume Control -->
+    <div class="volume-row">
+      <button class="volume-btn" id="btn-mute">
+        <svg id="vol-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        <svg id="vol-muted-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+      </button>
+      <div class="volume-slider-box" id="volume-slider-box">
+        <div class="volume-track">
+          <div class="volume-fill" id="volume-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Queue Bottom Sheet -->
+  <div class="sheet-backdrop" id="queue-backdrop">
+    <div class="queue-sheet">
+      <div class="sheet-handle-bar" id="queue-handle-bar">
+        <div class="sheet-handle"></div>
+      </div>
+      <div class="sheet-header">
+        <div class="sheet-title">Antrean Lagu (Queue)</div>
+        <button class="sheet-close-btn" id="btn-close-queue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <ul class="queue-list" id="queue-list">
+        <!-- Rendered dynamically -->
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Utilities
+      const formatTime = (sec) => {
+        if (!Number.isFinite(sec) || sec < 0) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+      };
+
+      const vibrate = (ms = 10) => {
+        try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {}
+      };
+
+      // State
+      let authToken = localStorage.getItem('riff_remote_token') || '';
+      let authPin = localStorage.getItem('riff_remote_pin') || '';
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('token')) {
+        authToken = params.get('token');
+        localStorage.setItem('riff_remote_token', authToken);
+      }
+      if (params.get('pin')) {
+        authPin = params.get('pin');
+        localStorage.setItem('riff_remote_pin', authPin);
+      }
+
+      let playerState = {
+        isPlaying: false,
+        currentTime: 0,
+        duration: 0,
+        volume: 0.85,
+        isMuted: false,
+        isShuffle: false,
+        isRepeat: false,
+        track: null,
+        queue: [],
+        queueIndex: -1,
+        updatedAt: Date.now()
+      };
+
+      let isDraggingScrubber = false;
+      let dragCurrentTime = 0;
+      let isDraggingVolume = false;
+      let sseSource = null;
+      let animFrameId = null;
+
+      // Elements
+      const el = {
+        pulseDot: document.getElementById('status-pulse'),
+        deviceLabel: document.getElementById('device-label'),
+        artCard: document.getElementById('art-card'),
+        artImg: document.getElementById('art-img'),
+        artFallback: document.getElementById('art-fallback'),
+        ambientGlow: document.getElementById('ambient-glow'),
+        trackTitle: document.getElementById('track-title'),
+        trackArtist: document.getElementById('track-artist'),
+        progressContainer: document.getElementById('progress-container'),
+        progressFill: document.getElementById('progress-fill'),
+        progressThumb: document.getElementById('progress-thumb'),
+        timeCurrent: document.getElementById('time-current'),
+        timeDuration: document.getElementById('time-duration'),
+        btnShuffle: document.getElementById('btn-shuffle'),
+        btnPrev: document.getElementById('btn-prev'),
+        btnPlayPause: document.getElementById('btn-play-pause'),
+        iconPlay: document.getElementById('icon-play'),
+        iconPause: document.getElementById('icon-pause'),
+        btnNext: document.getElementById('btn-next'),
+        btnRepeat: document.getElementById('btn-repeat'),
+        btnMute: document.getElementById('btn-mute'),
+        volIcon: document.getElementById('vol-icon'),
+        volMutedIcon: document.getElementById('vol-muted-icon'),
+        volumeSliderBox: document.getElementById('volume-slider-box'),
+        volumeFill: document.getElementById('volume-fill'),
+        btnToggleQueue: document.getElementById('btn-toggle-queue'),
+        queueCount: document.getElementById('queue-count'),
+        queueBackdrop: document.getElementById('queue-backdrop'),
+        btnCloseQueue: document.getElementById('btn-close-queue'),
+        queueList: document.getElementById('queue-list'),
+        offlineToast: document.getElementById('offline-toast'),
+        pinModal: document.getElementById('pin-modal'),
+        btnSubmitPin: document.getElementById('btn-submit-pin'),
+        pinInputs: [document.getElementById('d1'), document.getElementById('d2'), document.getElementById('d3'), document.getElementById('d4')]
+      };
+
+      // API Sender
+      async function sendCommand(action, payload = {}) {
+        vibrate(10);
+        try {
+          const res = await fetch('/api/command', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Riff-Token': authToken,
+              'X-Riff-Pin': authPin
+            },
+            body: JSON.stringify({ action, ...payload })
+          });
+          if (res.status === 401) {
+            showPinModal();
+          }
+        } catch (err) {
+          console.warn('[Remote] Command send failed:', err);
+        }
+      }
+
+      // PIN Modal Handling
+      function showPinModal() {
+        el.pinModal.classList.remove('hidden');
+        el.pinInputs[0].focus();
+      }
+      function hidePinModal() {
+        el.pinModal.classList.add('hidden');
+      }
+
+      el.pinInputs.forEach((input, idx) => {
+        input.addEventListener('input', (e) => {
+          if (input.value && idx < el.pinInputs.length - 1) {
+            el.pinInputs[idx + 1].focus();
+          }
+          if (idx === el.pinInputs.length - 1 && input.value) {
+            submitPin();
+          }
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !input.value && idx > 0) {
+            el.pinInputs[idx - 1].focus();
+          }
+        });
+      });
+
+      async function submitPin() {
+        const pin = el.pinInputs.map(i => i.value).join('');
+        if (pin.length !== 4) return;
+        try {
+          const res = await fetch('/api/verify-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin })
+          });
+          const data = await res.json();
+          if (data && data.ok) {
+            authToken = data.token;
+            authPin = pin;
+            localStorage.setItem('riff_remote_token', authToken);
+            localStorage.setItem('riff_remote_pin', authPin);
+            hidePinModal();
+            initSSE();
+          } else {
+            alert('PIN salah. Silakan periksa kembali di layar PC.');
+            el.pinInputs.forEach(i => i.value = '');
+            el.pinInputs[0].focus();
+          }
+        } catch (e) {
+          alert('Gagal menghubungi PC.');
+        }
+      }
+      el.btnSubmitPin.addEventListener('click', submitPin);
+
+      // Setup SSE Stream
+      function initSSE() {
+        if (sseSource) {
+          sseSource.close();
+          sseSource = null;
+        }
+
+        const sseUrl = `/api/stream?token=${encodeURIComponent(authToken)}&pin=${encodeURIComponent(authPin)}`;
+        sseSource = new EventSource(sseUrl);
+
+        sseSource.addEventListener('state', (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleStateUpdate(data);
+            hideOfflineToast();
+          } catch (e) {}
+        });
+
+        sseSource.onopen = () => {
+          hideOfflineToast();
+          hidePinModal();
+        };
+
+        sseSource.onerror = () => {
+          showOfflineToast();
+        };
+      }
+
+      function showOfflineToast() {
+        el.offlineToast.classList.add('visible');
+        el.pulseDot.style.background = '#ef4444';
+        el.pulseDot.style.boxShadow = '0 0 10px #ef4444';
+        el.deviceLabel.textContent = 'Terputus...';
+      }
+
+      function hideOfflineToast() {
+        el.offlineToast.classList.remove('visible');
+        el.pulseDot.style.background = 'var(--accent-green)';
+        el.pulseDot.style.boxShadow = '0 0 10px var(--accent-green)';
+        el.deviceLabel.textContent = 'PC Terhubung';
+      }
+
+      // Handle State Update from PC
+      function handleStateUpdate(newState) {
+        playerState = { ...playerState, ...newState };
+
+        // Track info
+        const track = playerState.track;
+        if (track) {
+          el.trackTitle.textContent = track.title || 'Tidak ada judul';
+          el.trackArtist.textContent = track.artist || track.album || 'Artis tidak diketahui';
+
+          // Thumbnail
+          const thumb = track.thumbnail || (track.id ? `/api/thumb?id=${track.id}` : '');
+          if (thumb) {
+            el.artImg.src = thumb.startsWith('http') || thumb.startsWith('/') ? thumb : `/api/thumb?url=${encodeURIComponent(thumb)}`;
+            el.artImg.style.display = 'block';
+            el.artFallback.style.display = 'none';
+          } else {
+            el.artImg.style.display = 'none';
+            el.artFallback.style.display = 'flex';
+          }
+        } else {
+          el.trackTitle.textContent = 'Tidak ada lagu';
+          el.trackArtist.textContent = 'Pilih lagu di Riff PC';
+          el.artImg.style.display = 'none';
+          el.artFallback.style.display = 'flex';
+        }
+
+        // Play / Pause Icon & Art zoom
+        el.iconPlay.style.display = playerState.isPlaying ? 'none' : 'block';
+        el.iconPause.style.display = playerState.isPlaying ? 'block' : 'none';
+        el.artCard.classList.toggle('playing', playerState.isPlaying);
+
+        // Toggles
+        el.btnShuffle.classList.toggle('active', !!playerState.isShuffle);
+        el.btnRepeat.classList.toggle('active', !!playerState.isRepeat);
+
+        // Volume
+        if (!isDraggingVolume) {
+          const vol = playerState.isMuted ? 0 : (playerState.volume ?? 0.85);
+          el.volumeFill.style.width = `${Math.round(vol * 100)}%`;
+          el.volIcon.style.display = playerState.isMuted || vol === 0 ? 'none' : 'block';
+          el.volMutedIcon.style.display = playerState.isMuted || vol === 0 ? 'block' : 'none';
+        }
+
+        // Duration label
+        const dur = (track && track.duration) || playerState.duration || 0;
+        el.timeDuration.textContent = formatTime(dur);
+
+        // Queue
+        renderQueue(playerState.queue, playerState.queueIndex);
+      }
+
+      // 60FPS local playback timeline interpolation
+      function startTicker() {
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        function tick() {
+          if (!isDraggingScrubber && playerState.isPlaying && playerState.duration > 0) {
+            const elapsedSinceUpdate = (Date.now() - (playerState.updatedAt || Date.now())) / 1000;
+            const liveCurrent = Math.min(playerState.duration, (playerState.currentTime || 0) + elapsedSinceUpdate);
+            const pct = Math.max(0, Math.min(100, (liveCurrent / playerState.duration) * 100));
+            el.progressFill.style.width = `${pct}%`;
+            el.progressThumb.style.left = `${pct}%`;
+            el.timeCurrent.textContent = formatTime(liveCurrent);
+          } else if (!isDraggingScrubber && !playerState.isPlaying && playerState.duration > 0) {
+            const pct = Math.max(0, Math.min(100, (playerState.currentTime / playerState.duration) * 100));
+            el.progressFill.style.width = `${pct}%`;
+            el.progressThumb.style.left = `${pct}%`;
+            el.timeCurrent.textContent = formatTime(playerState.currentTime);
+          }
+          animFrameId = requestAnimationFrame(tick);
+        }
+        animFrameId = requestAnimationFrame(tick);
+      }
+      startTicker();
+
+      // Scrubber Touch / Mouse Interactions
+      function updateScrubberFromPointer(clientX) {
+        const rect = el.progressContainer.getBoundingClientRect();
+        let pct = (clientX - rect.left) / rect.width;
+        pct = Math.max(0, Math.min(1, pct));
+        const dur = (playerState.track && playerState.track.duration) || playerState.duration || 0;
+        dragCurrentTime = pct * dur;
+        el.progressFill.style.width = `${pct * 100}%`;
+        el.progressThumb.style.left = `${pct * 100}%`;
+        el.timeCurrent.textContent = formatTime(dragCurrentTime);
+      }
+
+      el.progressContainer.addEventListener('pointerdown', (e) => {
+        isDraggingScrubber = true;
+        el.progressContainer.setPointerCapture(e.pointerId);
+        updateScrubberFromPointer(e.clientX);
+      });
+      el.progressContainer.addEventListener('pointermove', (e) => {
+        if (isDraggingScrubber) updateScrubberFromPointer(e.clientX);
+      });
+      el.progressContainer.addEventListener('pointerup', (e) => {
+        if (isDraggingScrubber) {
+          isDraggingScrubber = false;
+          playerState.currentTime = dragCurrentTime;
+          playerState.updatedAt = Date.now();
+          sendCommand('seek', { time: dragCurrentTime });
+        }
+      });
+      el.progressContainer.addEventListener('pointercancel', () => {
+        isDraggingScrubber = false;
+      });
+
+      // Volume Touch / Mouse Interactions
+      function updateVolumeFromPointer(clientX) {
+        const rect = el.volumeSliderBox.getBoundingClientRect();
+        let pct = (clientX - rect.left) / rect.width;
+        pct = Math.max(0, Math.min(1, pct));
+        el.volumeFill.style.width = `${pct * 100}%`;
+        playerState.volume = pct;
+        playerState.isMuted = false;
+        el.volIcon.style.display = pct === 0 ? 'none' : 'block';
+        el.volMutedIcon.style.display = pct === 0 ? 'block' : 'none';
+        sendCommand('volume', { value: pct });
+      }
+
+      el.volumeSliderBox.addEventListener('pointerdown', (e) => {
+        isDraggingVolume = true;
+        el.volumeSliderBox.setPointerCapture(e.pointerId);
+        updateVolumeFromPointer(e.clientX);
+      });
+      el.volumeSliderBox.addEventListener('pointermove', (e) => {
+        if (isDraggingVolume) updateVolumeFromPointer(e.clientX);
+      });
+      el.volumeSliderBox.addEventListener('pointerup', () => {
+        isDraggingVolume = false;
+      });
+      el.volumeSliderBox.addEventListener('pointercancel', () => {
+        isDraggingVolume = false;
+      });
+
+      // Button listeners
+      el.btnPlayPause.addEventListener('click', () => {
+        playerState.isPlaying = !playerState.isPlaying;
+        el.iconPlay.style.display = playerState.isPlaying ? 'none' : 'block';
+        el.iconPause.style.display = playerState.isPlaying ? 'block' : 'none';
+        el.artCard.classList.toggle('playing', playerState.isPlaying);
+        sendCommand('toggle');
+      });
+
+      el.btnNext.addEventListener('click', () => sendCommand('next'));
+      el.btnPrev.addEventListener('click', () => sendCommand('prev'));
+      el.btnShuffle.addEventListener('click', () => {
+        playerState.isShuffle = !playerState.isShuffle;
+        el.btnShuffle.classList.toggle('active', playerState.isShuffle);
+        sendCommand('shuffle');
+      });
+      el.btnRepeat.addEventListener('click', () => {
+        playerState.isRepeat = !playerState.isRepeat;
+        el.btnRepeat.classList.toggle('active', playerState.isRepeat);
+        sendCommand('repeat');
+      });
+      el.btnMute.addEventListener('click', () => {
+        playerState.isMuted = !playerState.isMuted;
+        const vol = playerState.isMuted ? 0 : (playerState.volume || 0.85);
+        el.volumeFill.style.width = `${Math.round(vol * 100)}%`;
+        el.volIcon.style.display = playerState.isMuted ? 'none' : 'block';
+        el.volMutedIcon.style.display = playerState.isMuted ? 'block' : 'none';
+        sendCommand('volume', { value: vol });
+      });
+
+      // Queue Drawer
+      function openQueue() {
+        vibrate(10);
+        el.queueBackdrop.classList.add('open');
+      }
+      function closeQueue() {
+        el.queueBackdrop.classList.remove('open');
+      }
+      el.btnToggleQueue.addEventListener('click', openQueue);
+      el.btnCloseQueue.addEventListener('click', closeQueue);
+      el.queueBackdrop.addEventListener('click', (e) => {
+        if (e.target === el.queueBackdrop) closeQueue();
+      });
+
+      function renderQueue(queue, currentIndex) {
+        if (!Array.isArray(queue)) return;
+        el.queueCount.textContent = queue.length;
+        el.queueList.innerHTML = '';
+
+        if (queue.length === 0) {
+          el.queueList.innerHTML = '<li style="text-align:center;padding:30px;color:var(--text-muted);font-size:14px;">Antrean kosong</li>';
+          return;
+        }
+
+        queue.forEach((item, idx) => {
+          const isActive = idx === currentIndex;
+          const li = document.createElement('li');
+          li.className = `queue-item ${isActive ? 'active' : ''}`;
+
+          const thumbSrc = item.thumbnail || (item.id ? `/api/thumb?id=${item.id}` : '');
+          li.innerHTML = `
+            <img class="queue-item-thumb" src="${thumbSrc || ''}" onerror="this.style.opacity='0.2'">
+            <div class="queue-item-info">
+              <div class="queue-item-title">${item.title || 'Lagu ' + (idx + 1)}</div>
+              <div class="queue-item-artist">${item.artist || 'Artis'}</div>
+            </div>
+            ${isActive ? `
+              <div class="eq-wave">
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+              </div>
+            ` : ''}
+            <div class="queue-item-dur">${formatTime(item.duration || 0)}</div>
+          `;
+
+          li.addEventListener('click', () => {
+            sendCommand('playQueueIndex', { index: idx });
+            closeQueue();
+          });
+
+          el.queueList.appendChild(li);
+        });
+      }
+
+      // Check if credentials exist or verify status
+      async function start() {
+        if (!authToken && !authPin) {
+          showPinModal();
+        } else {
+          initSSE();
+        }
+      }
+      start();
+    })();
+  </script>
+</body>
+</html>

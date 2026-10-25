@@ -7682,3 +7682,264 @@ body.multi-select-on .track-row.selectable .track-row-actions {
   opacity: 0.4;
   cursor: default;
 }
+
+/* Synth Connect (Remote Control) */
+.btn-icon-pill {
+  position: relative;
+}
+.remote-connect-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+.remote-connect-dot.hidden {
+  display: none !important;
+}
+
+.remote-modal-card {
+  width: 440px;
+  max-width: 92vw;
+  padding: 24px;
+  box-sizing: border-box;
+}
+.remote-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.remote-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.remote-modal-title-group h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.remote-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #10b981;
+}
+.remote-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+.remote-modal-desc {
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.remote-qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0 16px;
+}
+.remote-qr-box {
+  width: 190px;
+  height: 190px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.remote-qr-box img {
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.remote-qr-loading {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+.remote-info-card {
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.remote-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.remote-info-label {
+  color: var(--md-sys-color-on-surface-variant);
+  font-weight: 500;
+}
+.remote-url-copy-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.remote-info-val {
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--md-sys-color-primary);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-icon-copy {
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant, rgba(255,255,255,0.1));
+  color: var(--md-sys-color-on-surface);
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.btn-icon-copy:active {
+  transform: scale(0.9);
+}
+.remote-pin-code {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--md-sys-color-primary);
+  font-family: monospace;
+}
+.remote-connected-label {
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+.remote-instructions {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 8px;
+}
+.remote-instructions ol {
+  padding-left: 20px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Remote Tabs & Synth APK Client Mode */
+.remote-tabs {
+  display: flex;
+  background: var(--md-sys-color-surface-container);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 16px;
+  gap: 4px;
+}
+.remote-tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.remote-tab-btn.active {
+  background: var(--md-sys-color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.remote-pane {
+  display: none;
+}
+.remote-pane.active {
+  display: block;
+}
+.remote-client-field {
+  margin-bottom: 12px;
+}
+.remote-client-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 6px;
+}
+.remote-client-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.remote-client-status {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--md-sys-color-surface-container);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.remote-sync-box {
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 14px;
+}
+.remote-sync-box h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+.remote-sync-box p {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+.remote-playing-on-pc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+

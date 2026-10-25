@@ -1,9 +1,9 @@
 {
-  "name": "riff",
+  "name": "synth",
   "version": "42.3.0",
   "main": "main.js",
   "bin": {
-    "riff": "./cli.js"
+    "synth": "./cli.js"
   },
   "scripts": {
     "start": "electron .",
@@ -14,9 +14,9 @@
     "release:major": "npm version major && git push --follow-tags"
   },
   "keywords": [],
-  "author": "rootscripts",
+  "author": "MrPainOi",
   "license": "MIT",
-  "description": "made for humans, Riff - audio player.",
+  "description": "made for humans, Synth - audio player.",
   "devDependencies": {
     "electron": "^41.7.1",
     "electron-builder": "^26.15.3"
@@ -26,20 +26,21 @@
     "discord-rpc": "^4.0.1",
     "electron-updater": "^6.8.9",
     "hls.js": "^1.7.1",
+    "qrcode": "^1.5.4",
     "tone": "^15.1.22"
   },
-  "productName": "Riff",
-  "homepage": "https://github.com/rootscripts/riff",
+  "productName": "Synth",
+  "homepage": "https://github.com/MrPainOi/Synth",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rootscripts/riff.git"
+    "url": "git+https://github.com/MrPainOi/Synth.git"
   },
   "bugs": {
-    "url": "https://github.com/rootscripts/riff/issues"
+    "url": "https://github.com/MrPainOi/Synth/issues"
   },
   "build": {
-    "appId": "io.github.rootscripts.riff",
-    "productName": "Riff",
+    "appId": "io.github.mrpainoi.synth",
+    "productName": "Synth",
     "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "dist"
@@ -108,8 +109,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "rootscripts",
-        "repo": "riff",
+        "owner": "MrPainOi",
+        "repo": "Synth",
         "releaseType": "release"
       }
     ]

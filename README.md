@@ -20,12 +20,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/rootscripts/riff/releases">
+  <a href="https://github.com/MrPainOi/Synth/releases">
     <img src="https://img.shields.io/badge/Download-6750A4?style=for-the-badge&logo=download&logoColor=white" height="40" alt="Download">
-  </a>
-  &nbsp;
-  <a href="https://riff.hs.vc">
-    <img src="https://img.shields.io/badge/Website-1F2328?style=for-the-badge&logo=open-webui&logoColor=white" height="40" alt="Visit Website">
   </a>
 </p>
 
@@ -39,10 +35,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/rootscripts/riff/stargazers"><img src="https://img.shields.io/github/stars/rootscripts/riff?style=flat-square&labelColor=16191C&color=CAD3F5" alt="Stars"></a>
-  <a href="https://github.com/rootscripts/riff/commits/main"><img src="https://img.shields.io/github/last-commit/rootscripts/riff?style=flat-square&labelColor=16191C&color=94C9FF" alt="Last Commit"></a>
-  <a href="https://github.com/rootscripts/riff/blob/main/LICENSE"><img src="https://img.shields.io/github/license/rootscripts/riff?style=flat-square&labelColor=16191C&color=8EEDD8" alt="License"></a>
-  <a href="https://ko-fi.com/rootlesszen"><img src="https://img.shields.io/badge/Ko--fi-support-FF5E5B?style=flat-square&logo=kofi&logoColor=white&labelColor=16191C" alt="Support on Ko-fi"></a>
+  <a href="https://github.com/MrPainOi/Synth/stargazers"><img src="https://img.shields.io/github/stars/MrPainOi/Synth?style=flat-square&labelColor=16191C&color=CAD3F5" alt="Stars"></a>
+  <a href="https://github.com/MrPainOi/Synth/commits/main"><img src="https://img.shields.io/github/last-commit/MrPainOi/Synth?style=flat-square&labelColor=16191C&color=94C9FF" alt="Last Commit"></a>
+  <a href="https://github.com/MrPainOi/Synth/blob/main/LICENSE"><img src="https://img.shields.io/github/license/MrPainOi/Synth?style=flat-square&labelColor=16191C&color=8EEDD8" alt="License"></a>
 </p>
 
 > [!NOTE]
@@ -117,7 +112,7 @@ Migrate existing music libraries between platforms in a single operation:
 
 ## Download and install
 
-Pre-built binaries are available on the [Releases page](https://github.com/rootscripts/riff/releases).
+Pre-built binaries are available on the [Releases page](https://github.com/MrPainOi/Synth/releases).
 
 Standard releases include all necessary dependencies (bundled yt-dlp and ffmpeg binaries). No secondary runtime configuration is required on Windows or Linux.
 
@@ -126,32 +121,32 @@ Standard releases include all necessary dependencies (bundled yt-dlp and ffmpeg 
 macOS support is currently experimental and compiled via continuous integration.
 
 1. Download the appropriate image:
-   - `Riff-<version>-mac-arm64.dmg` for Apple Silicon (M1 / M2 / M3 / M4)
-   - `Riff-<version>-mac-x64.dmg` for Intel-based hardware
-2. Open the disk image and drag Riff to your `Applications` directory.
-3. Because the binary is unsigned, right-click `Riff.app` in `Applications`, select **Open**, and confirm the prompt.
+   - `Synth-<version>-mac-arm64.dmg` for Apple Silicon (M1 / M2 / M3 / M4)
+   - `Synth-<version>-mac-x64.dmg` for Intel-based hardware
+2. Open the disk image and drag Synth to your `Applications` directory.
+3. Because the binary is unsigned, right-click `Synth.app` in `Applications`, select **Open**, and confirm the prompt.
 4. If macOS flags the bundle as damaged, execute the following command in Terminal:
    ```bash
-   xattr -cr /Applications/Riff.app
+   xattr -cr /Applications/Synth.app
    ```
    If a quarantine warning occurs when mounting the `.dmg` itself, run:
    ```bash
-   xattr -d -r com.apple.quarantine /path/to/Riff.dmg
+   xattr -d -r com.apple.quarantine /path/to/Synth.dmg
    ```
-5. Install the required runtime binaries via Homebrew (Riff detects Homebrew paths automatically):
+5. Install the required runtime binaries via Homebrew (Synth detects Homebrew paths automatically):
    ```bash
    brew install yt-dlp ffmpeg
    ```
 
-macOS application data and local indexes are stored in `~/Library/Application Support/Riff`.
+macOS application data and local indexes are stored in `~/Library/Application Support/Synth`.
 
 ## Build from source
 
 Requires Node.js 18 or newer and npm.
 
 ```bash
-git clone https://github.com/rootscripts/riff.git
-cd riff
+git clone https://github.com/MrPainOi/Synth.git
+cd Synth
 npm install
 npm start        # run the dev version
 npm run dist     # make a production build

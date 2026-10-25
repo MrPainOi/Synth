@@ -197,7 +197,7 @@ function runGUI() {
     const primaryDisplay = screen.getPrimaryDisplay();
     const scaleFactor = primaryDisplay.scaleFactor;
 
-    app.setAppUserModelId('io.github.rootscripts.riff');
+    app.setAppUserModelId('io.github.mrpainoi.synth');
     mainWindow = new BrowserWindow({
       x: initialBounds.x,
       y: initialBounds.y,
@@ -206,7 +206,7 @@ function runGUI() {
       minWidth: 360,
                                    minHeight: 500,
                                    backgroundColor: firstRun ? '#8d5ef2' : '#000000',
-                                   title: 'Riff',
+                                   title: 'Synth',
                                    icon: path.join(__dirname, 'assets', 'icon.png'),
                                    frame: false,
                                    titleBarStyle: 'hidden',
@@ -295,6 +295,24 @@ function runGUI() {
     });
 
     discordRPC.initRPC();
+
+    const remoteServer = require('./remote-server');
+    remoteServer.start(
+      38473,
+      (cmd) => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          if (cmd && cmd.action === 'syncLibrary') {
+            mainWindow.webContents.send('remote-library-sync', cmd);
+          }
+          mainWindow.webContents.send('remote-command', cmd);
+        }
+      },
+      (status) => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('remote-status-changed', status);
+        }
+      }
+    ).catch((err) => console.warn('[RemoteServer] Startup error:', err));
   }
 
   ipcMain.removeHandler('get-server-port');
@@ -339,7 +357,7 @@ function runGUI() {
     });
 
     ipcMain.handle('get-diagnostics', async () => {
-      const lines = [`Riff ${app.getVersion()}`, `OS ${process.platform} ${process.arch} ${os.release()}`, `Electron ${process.versions.electron} Chromium ${process.versions.chrome} Node ${process.versions.node}`, `Locale ${app.getLocale()}`, `Data ${DATA_DIR}`];
+      const lines = [`Synth ${app.getVersion()}`, `OS ${process.platform} ${process.arch} ${os.release()}`, `Electron ${process.versions.electron} Chromium ${process.versions.chrome} Node ${process.versions.node}`, `Locale ${app.getLocale()}`, `Data ${DATA_DIR}`];
       for (const name of ['yt-dlp', 'ffmpeg']) {
         const bin = resolveBinary(name);
         lines.push(`${name}: ${bin || 'NOT FOUND'}`);
@@ -353,6 +371,43 @@ function runGUI() {
       ipcMain.handle('get-gpu-compositing', () => { try { return String(app.getGPUFeatureStatus().gpu_compositing || ''); } catch (e) { return ''; } });
       ipcMain.handle('launcher-info', () => getLauncherInfo());
       ipcMain.handle('get-audio-output-info', async () => getSystemAudioOutputInfo());
+
+      ipcMain.handle('remote-get-status', async () => {
+        const remoteServer = require('./remote-server');
+        return await remoteServer.getStatus();
+      });
+
+      ipcMain.handle('remote-set-enabled', async (event, enabled) => {
+        const remoteServer = require('./remote-server');
+        if (enabled) {
+          return await remoteServer.start(
+            38473,
+            (cmd) => {
+              if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('remote-command', cmd);
+              }
+            },
+            (status) => {
+              if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('remote-status-changed', status);
+              }
+            }
+          );
+        } else {
+          await remoteServer.stop();
+          return await remoteServer.getStatus();
+        }
+      });
+
+      ipcMain.on('remote-state-from-renderer', (event, state) => {
+        const remoteServer = require('./remote-server');
+        remoteServer.updateState(state);
+      });
+
+      ipcMain.on('remote-library-from-renderer', (event, lib) => {
+        const remoteServer = require('./remote-server');
+        remoteServer.updateLibrary(lib);
+      });
       require('./themes').register(() => mainWindow);
       require('./plugins').register(() => mainWindow);
 
@@ -632,7 +687,7 @@ function runGUI() {
           let trayIcon = nativeImage.createFromPath(iconPath);
           trayIcon = trayIcon.resize({ width: 22, height: 22 });
           tray = new Tray(trayIcon);
-          tray.setToolTip('Riff');
+          tray.setToolTip('Synth');
           const contextMenu = Menu.buildFromTemplate([
             {
               label: 'Show/Hide',
@@ -673,6 +728,7 @@ function runGUI() {
 
       app.on('before-quit', () => {
         isQuitting = true;
+        try { require('./remote-server').stop(); } catch (_) {}
       });
 
       app.whenReady().then(() => {

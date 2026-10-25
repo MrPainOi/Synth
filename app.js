@@ -52,6 +52,7 @@
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {
+  var lastRemoteBroadcastTime = 0;
   try { localStorage.removeItem('riff_stats'); } catch (e) {}
 
   function escapeHtml(value) {
@@ -466,6 +467,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                           history: safeArray('devsize_history'),
                           playlists: safeArray('devsize_playlists'),
                           customPresets: normalizedCustomPresets,
+                          remoteClientMode: localStorage.getItem('riff_remote_client_mode') === 'true',
+                          remoteHostIp: localStorage.getItem('riff_remote_host_ip') || '',
+                          remoteHostPin: localStorage.getItem('riff_remote_host_pin') || '',
+                          remoteHostToken: localStorage.getItem('riff_remote_host_token') || '',
                           localTracks: [],
                           syncedLyrics: [],
                           glitchTimes: [],
@@ -538,6 +543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function sendStateToServer(currentWordText = '', wordIndex = -1, lineIndex = -1) {
+    if (typeof broadcastRemoteState === 'function') broadcastRemoteState();
     if (!state.currentTrack) return;
     fetch(`http://127.0.0.1:${state.serverPort}/api/state`, {
       method: 'POST',
@@ -1566,6 +1572,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                           volumeIcon: document.getElementById('volume-icon'),
                           volumeMutedIcon: document.getElementById('volume-muted-icon'),
                           volumeSlider: document.getElementById('volume-slider'),
+                          btnRemoteConnect: document.getElementById('btn-remote-connect'),
+                          remoteConnectDot: document.getElementById('remote-connect-dot'),
+                          remoteConnectModal: document.getElementById('remote-connect-modal'),
+                          btnCloseRemoteModal: document.getElementById('btn-close-remote-modal'),
+                          remoteQrImg: document.getElementById('remote-qr-img'),
+                          remoteQrLoading: document.getElementById('remote-qr-loading'),
+                          remoteUrlText: document.getElementById('remote-url-text'),
+                          remotePinText: document.getElementById('remote-pin-text'),
+                          remoteConnectedCount: document.getElementById('remote-connected-count'),
+                          btnCopyRemoteUrl: document.getElementById('btn-copy-remote-url'),
+                          tabBtnHost: document.getElementById('tab-btn-host'),
+                          tabBtnClient: document.getElementById('tab-btn-client'),
+                          remotePaneHost: document.getElementById('remote-pane-host'),
+                          remotePaneClient: document.getElementById('remote-pane-client'),
+                          inputRemoteHostIp: document.getElementById('input-remote-host-ip'),
+                          inputRemoteHostPin: document.getElementById('input-remote-host-pin'),
+                          btnClientConnect: document.getElementById('btn-client-connect'),
+                          btnClientDisconnect: document.getElementById('btn-client-disconnect'),
+                          remoteClientStatusText: document.getElementById('remote-client-status-text'),
+                          remoteClientStatusIndicator: document.getElementById('remote-client-status-indicator'),
+                          btnClientSyncNow: document.getElementById('btn-client-sync-now'),
+                          remoteClientSyncStatus: document.getElementById('remote-client-sync-status'),
 
                           downloadModal: document.getElementById('download-modal'),
                           btnCloseDownloadModal: document.getElementById('btn-close-download-modal'),
@@ -2674,6 +2702,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateThemeFromState();
     updateMediaSession();
     if (state.isTvKaraokeOpen) updateTvKaraokeMeta();
+    if (typeof broadcastRemoteState === 'function') broadcastRemoteState(true);
   }
 
   function updateRightPanelBanner(thumbUrl) {
@@ -2873,7 +2902,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   let navigatingBack = false;
 
   async function playTrack(track, queueList = null, startIndex = -1, context = null) {
-    if (!track || !el.nativeAudio) return;
+    if (!track) return;
+    if (state.remoteClientMode && state.remoteHostIp) {
+      if (typeof sendRemoteClientCommand === 'function') {
+        sendRemoteClientCommand('playTrack', { track, queueList, startIndex, context });
+      }
+      return;
+    }
+    if (!el.nativeAudio) return;
     resetLevelWatcher();
     vizPrev = null;
     if (state.currentTrack && state.currentTrack.id !== track.id && !navigatingBack) pushPlayHistory(state.currentTrack);
@@ -5104,6 +5140,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.playSmooth = playSmooth;
 
   function togglePlayPause() {
+    if (state.remoteClientMode && state.remoteHostIp) {
+      if (typeof sendRemoteClientCommand === 'function') sendRemoteClientCommand('toggle');
+      return;
+    }
     if (!state.currentTrack) {
       if (state.queue.length > 0) playTrack(state.queue[0]);
       else if (el.nativeAudio && el.nativeAudio.src) {
@@ -5139,6 +5179,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function playNext() {
+    if (state.remoteClientMode && state.remoteHostIp) {
+      if (typeof sendRemoteClientCommand === 'function') sendRemoteClientCommand('next');
+      return;
+    }
     if (state.queue.length === 0) return;
 
     if (!state._isNaturalEnding && state.myWaveActive && state.currentTrack) {
@@ -5179,6 +5223,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function playPrev() {
+    if (state.remoteClientMode && state.remoteHostIp) {
+      if (typeof sendRemoteClientCommand === 'function') sendRemoteClientCommand('prev');
+      return;
+    }
     if (el.nativeAudio && el.nativeAudio.currentTime > 3) {
       el.nativeAudio.currentTime = 0;
       return;
@@ -5388,6 +5436,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (state.isPlaying && dur > 0 && cur / dur > 0.5 && !state.nextTrackPrefetched) {
         state.nextTrackPrefetched = true;
         prefetchNextQueueTrack();
+      }
+
+      if (typeof broadcastRemoteState === 'function') {
+        broadcastRemoteState();
       }
 
       if (!state.isPlaying && typeof m3cDraw === 'function' && typeof m3cEnabled === 'function' && m3cEnabled()) {
@@ -7995,6 +8047,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       btn._morphAnim = btn.animate(keyframes, { duration: 340, easing: 'linear' });
     }
+    if (typeof broadcastRemoteState === 'function') broadcastRemoteState(true);
   }
 
   function updatePlayPauseButton(isPlaying, isBuffering = false) {
@@ -10504,7 +10557,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll(`style[data-plugin="${p.file}"]`).forEach((n) => n.remove());
     const hadStop = !!(entry && entry.stop);
     loadedPlugins.delete(p.file);
-    if (!silent && !hadStop) showToast(`Restart Riff to fully unload "${p.name}"`, 'info');
+    if (!silent && !hadStop) showToast(`Restart Synth to fully unload "${p.name}"`, 'info');
   }
   let pluginsCache = [];
   function renderPluginCards() {
@@ -10558,9 +10611,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPluginCards();
   }
   if (pluginsApi && pluginsApi.listPlugins) {
-    document.getElementById('btn-plugins-folder').addEventListener('click', () => pluginsApi.openPluginsFolder());
-    document.getElementById('btn-plugins-reload').addEventListener('click', reloadPluginsList);
-    document.getElementById('btn-add-plugin').addEventListener('click', async () => {
+    const btnPluginsFolder = document.getElementById('btn-plugins-folder');
+    if (btnPluginsFolder) btnPluginsFolder.addEventListener('click', () => pluginsApi.openPluginsFolder());
+    const btnPluginsReload = document.getElementById('btn-plugins-reload');
+    if (btnPluginsReload) btnPluginsReload.addEventListener('click', reloadPluginsList);
+    const btnAddPlugin = document.getElementById('btn-add-plugin');
+    if (btnAddPlugin) btnAddPlugin.addEventListener('click', async () => {
       const added = await pluginsApi.importPlugins();
       if (!added) return;
       pluginsCache = await pluginsApi.listPlugins();
@@ -10731,6 +10787,400 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.electronAPI && window.electronAPI.onMediaCommand) {
     window.electronAPI.onMediaCommand((cmd) => handleMediaCommand(cmd, 'ipc'));
   }
+
+  // --- Synth Connect (Remote Control dari HP) ---
+  function broadcastRemoteState(immediate = false) {
+    if (!window.electronAPI || !window.electronAPI.sendRemoteState) return;
+    if (typeof el === 'undefined' || !el || !el.nativeAudio) return;
+    const now = performance.now();
+    if (!immediate && now - lastRemoteBroadcastTime < 700) return;
+    lastRemoteBroadcastTime = now;
+
+    const audio = (state.secondaryAudio && !state.secondaryAudio.paused) ? state.secondaryAudio : el.nativeAudio;
+    const cur = (audio && Number.isFinite(audio.currentTime)) ? audio.currentTime : 0;
+    const dur = (audio && Number.isFinite(audio.duration) && audio.duration > 0)
+      ? audio.duration
+      : (state.currentTrack && Number.isFinite(state.currentTrack.duration) ? state.currentTrack.duration : 0);
+
+    const track = state.currentTrack ? {
+      id: state.currentTrack.id,
+      title: state.currentTrack.title,
+      artist: state.currentTrack.artist,
+      album: state.currentTrack.album,
+      thumbnail: (typeof getTrackThumbUrl === 'function' ? getTrackThumbUrl(state.currentTrack) : '') || state.currentTrack.thumbnail || '',
+      duration: dur
+    } : null;
+
+    const queueSummary = (state.queue || []).slice(0, 100).map((t, idx) => ({
+      id: t.id,
+      title: t.title,
+      artist: t.artist,
+      thumbnail: (typeof getTrackThumbUrl === 'function' ? getTrackThumbUrl(t) : '') || t.thumbnail || '',
+      duration: t.duration || 0,
+      index: idx
+    }));
+
+    const payload = {
+      isPlaying: !!state.isPlaying,
+      currentTime: cur,
+      duration: dur,
+      volume: state.volume !== undefined ? state.volume : (el.volumeSlider ? parseFloat(el.volumeSlider.value) : 0.85),
+      isMuted: !!state.isMuted,
+      isShuffle: !!state.isShuffle,
+      isRepeat: !!state.isRepeat,
+      track,
+      queue: queueSummary,
+      queueIndex: state.queueIndex
+    };
+
+    window.electronAPI.sendRemoteState(payload);
+  }
+
+  function updateRemoteStatusUI(status) {
+    if (!status) return;
+    if (el.remoteConnectDot) {
+      el.remoteConnectDot.classList.toggle('hidden', !status.clientCount || status.clientCount <= 0);
+    }
+    if (el.remoteConnectedCount) {
+      el.remoteConnectedCount.textContent = status.clientCount > 0
+        ? `${status.clientCount} perangkat terhubung`
+        : '0 perangkat terhubung (Menunggu...)';
+      el.remoteConnectedCount.style.color = status.clientCount > 0 ? '#10b981' : '';
+    }
+    if (el.remotePinText && status.pin) {
+      el.remotePinText.textContent = status.pin;
+    }
+    if (el.remoteUrlText && status.connectUrl) {
+      el.remoteUrlText.textContent = status.connectUrl;
+    }
+    if (el.remoteQrImg && status.qrDataUrl) {
+      el.remoteQrImg.src = status.qrDataUrl;
+      el.remoteQrImg.style.display = 'block';
+      if (el.remoteQrLoading) el.remoteQrLoading.style.display = 'none';
+    }
+  }
+
+  if (window.electronAPI && window.electronAPI.onRemoteCommand) {
+    window.electronAPI.onRemoteCommand((cmd) => {
+      if (!cmd || !cmd.action) return;
+      const action = cmd.action;
+      if (action === 'toggle' || action === 'play-pause' || action === 'play' || action === 'pause' || action === 'next' || action === 'prev' || action === 'stop') {
+        handleMediaCommand(action === 'play-pause' ? 'toggle' : action, 'remote');
+      } else if (action === 'seek' && Number.isFinite(cmd.time)) {
+        const audio = (state.secondaryAudio && !state.secondaryAudio.paused) ? state.secondaryAudio : el.nativeAudio;
+        if (audio) {
+          audio.currentTime = cmd.time;
+          if (typeof updateSyncedLyricsHighlight === 'function') {
+            updateSyncedLyricsHighlight(cmd.time);
+          }
+          if (typeof updateMediaPositionState === 'function') {
+            updateMediaPositionState();
+          }
+        }
+        broadcastRemoteState(true);
+      } else if (action === 'volume' && Number.isFinite(cmd.value)) {
+        const v = Math.max(0, Math.min(1, cmd.value));
+        state.volume = v;
+        state.isMuted = false;
+        if (el.volumeSlider) {
+          el.volumeSlider.value = v;
+          el.volumeSlider.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        broadcastRemoteState(true);
+      } else if (action === 'shuffle') {
+        if (el.btnShuffle) el.btnShuffle.click();
+      } else if (action === 'repeat') {
+        if (el.btnRepeat) el.btnRepeat.click();
+      } else if (action === 'playQueueIndex' && Number.isFinite(cmd.index)) {
+        if (state.queue && state.queue[cmd.index]) {
+          playTrack(state.queue[cmd.index], null, cmd.index);
+        }
+      } else if ((action === 'playTrack' || action === 'play-track') && cmd.track) {
+        playTrack(cmd.track, cmd.queueList || null, cmd.startIndex !== undefined ? cmd.startIndex : -1, cmd.context || null);
+      }
+    });
+  }
+
+  if (window.electronAPI && window.electronAPI.onRemoteLibrarySync) {
+    window.electronAPI.onRemoteLibrarySync((cmd) => {
+      if (!cmd) return;
+      let changed = false;
+      if (Array.isArray(cmd.favorites)) {
+        state.favorites = cmd.favorites;
+        localStorage.setItem('devsize_favorites', JSON.stringify(state.favorites));
+        changed = true;
+      }
+      if (Array.isArray(cmd.playlists)) {
+        state.playlists = cmd.playlists;
+        localStorage.setItem('devsize_playlists', JSON.stringify(state.playlists));
+        changed = true;
+      }
+      if (changed) {
+        if (typeof renderFavorites === 'function' && state.currentView === 'favorites') renderFavorites();
+        if (typeof renderPlaylists === 'function' && state.currentView === 'playlists') renderPlaylists();
+        showToast('Library (Favorit & Playlist) disinkronkan!', 'info');
+      }
+    });
+  }
+
+  // --- Muriel Client Mode (Kontrol PC dari HP) ---
+  let clientSseSource = null;
+
+  async function sendRemoteClientCommand(action, payload = {}) {
+    if (!state.remoteHostIp) return;
+    try {
+      const url = `http://${state.remoteHostIp}:38473/api/command`;
+      await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Riff-Pin': state.remoteHostPin || '',
+          'X-Riff-Token': state.remoteHostToken || ''
+        },
+        body: JSON.stringify({ action, ...payload })
+      });
+    } catch (err) {
+      console.warn('[Muriel Client] Error sending command:', err);
+    }
+  }
+
+  function updateClientUIConnected(connected) {
+    if (el.btnClientConnect) el.btnClientConnect.style.display = connected ? 'none' : 'block';
+    if (el.btnClientDisconnect) el.btnClientDisconnect.style.display = connected ? 'block' : 'none';
+    if (el.remoteClientStatusIndicator) {
+      el.remoteClientStatusIndicator.style.background = connected ? '#10b981' : '#9ca3af';
+    }
+    if (el.remoteClientStatusText) {
+      el.remoteClientStatusText.textContent = connected
+        ? `🔊 Terhubung ke PC (${state.remoteHostIp}) - Suara di PC`
+        : 'Belum terhubung ke PC';
+    }
+  }
+
+  function startClientSSE() {
+    if (clientSseSource) clientSseSource.close();
+    const sseUrl = `http://${state.remoteHostIp}:38473/api/stream?pin=${encodeURIComponent(state.remoteHostPin)}&token=${encodeURIComponent(state.remoteHostToken)}`;
+    clientSseSource = new EventSource(sseUrl);
+
+    clientSseSource.addEventListener('state', (e) => {
+      try {
+        const hostState = JSON.parse(e.data);
+        if (hostState.track) {
+          state.currentTrack = hostState.track;
+          if (el.playbarTitle) el.playbarTitle.textContent = hostState.track.title || '';
+          if (el.playbarArtist) el.playbarArtist.textContent = hostState.track.artist || '';
+          const thumb = hostState.track.thumbnail || '';
+          if (el.playbarArtwork && thumb) {
+            el.playbarArtwork.src = thumb;
+            el.playbarArtwork.style.display = 'block';
+            if (el.artworkFallback) el.artworkFallback.style.display = 'none';
+          }
+        }
+        state.isPlaying = !!hostState.isPlaying;
+        updatePlayPauseButton(state.isPlaying, false);
+
+        if (Number.isFinite(hostState.duration) && hostState.duration > 0) {
+          if (el.timeDuration) el.timeDuration.textContent = formatDuration(hostState.duration);
+        }
+        if (Number.isFinite(hostState.currentTime) && el.timeCurrent) {
+          el.timeCurrent.textContent = formatDuration(hostState.currentTime);
+        }
+        if (Array.isArray(hostState.queue)) {
+          state.queue = hostState.queue;
+          state.queueIndex = hostState.queueIndex;
+        }
+      } catch (_) {}
+    });
+
+    clientSseSource.onerror = () => {
+      if (el.remoteClientStatusIndicator) el.remoteClientStatusIndicator.style.background = '#ef4444';
+      if (el.remoteClientStatusText) el.remoteClientStatusText.textContent = 'Terputus dari PC... Mencoba lagi';
+    };
+
+    clientSseSource.onopen = () => {
+      updateClientUIConnected(true);
+    };
+  }
+
+  function connectToRemoteHost(ip, pin) {
+    if (!ip) return;
+    state.remoteHostIp = ip.trim();
+    state.remoteHostPin = (pin || '').trim();
+    localStorage.setItem('riff_remote_host_ip', state.remoteHostIp);
+    localStorage.setItem('riff_remote_host_pin', state.remoteHostPin);
+
+    fetch(`http://${state.remoteHostIp}:38473/api/verify-pin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: state.remoteHostPin })
+    }).then(res => res.json()).then(data => {
+      if (data && data.ok) {
+        state.remoteHostToken = data.token;
+        localStorage.setItem('riff_remote_host_token', data.token);
+        state.remoteClientMode = true;
+        localStorage.setItem('riff_remote_client_mode', 'true');
+        updateClientUIConnected(true);
+        startClientSSE();
+        syncLibraryWithHost();
+        showToast('Terhubung ke PC! Audio berputar di PC.', 'info');
+      } else {
+        alert('PIN salah atau tidak dapat terhubung ke PC.');
+        updateClientUIConnected(false);
+      }
+    }).catch(() => {
+      alert('Gagal menghubungi PC. Pastikan PC dan HP di Wi-Fi yang sama dan port 38473 terbuka.');
+      updateClientUIConnected(false);
+    });
+  }
+
+  function disconnectFromRemoteHost() {
+    state.remoteClientMode = false;
+    localStorage.setItem('riff_remote_client_mode', 'false');
+    if (clientSseSource) {
+      clientSseSource.close();
+      clientSseSource = null;
+    }
+    updateClientUIConnected(false);
+    showToast('Koneksi remote diputus. Mode lokal aktif.', 'info');
+  }
+
+  async function syncLibraryWithHost() {
+    if (!state.remoteHostIp) return;
+    if (el.remoteClientSyncStatus) el.remoteClientSyncStatus.textContent = 'Menyinkronkan...';
+    try {
+      const res = await fetch(`http://${state.remoteHostIp}:38473/api/sync-library`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Riff-Pin': state.remoteHostPin || '',
+          'X-Riff-Token': state.remoteHostToken || ''
+        },
+        body: JSON.stringify({
+          favorites: state.favorites || [],
+          playlists: state.playlists || []
+        })
+      });
+      const data = await res.json();
+      if (data && data.ok && data.library) {
+        if (Array.isArray(data.library.favorites)) {
+          state.favorites = data.library.favorites;
+          localStorage.setItem('devsize_favorites', JSON.stringify(state.favorites));
+        }
+        if (Array.isArray(data.library.playlists)) {
+          state.playlists = data.library.playlists;
+          localStorage.setItem('devsize_playlists', JSON.stringify(state.playlists));
+        }
+        if (el.remoteClientSyncStatus) {
+          el.remoteClientSyncStatus.textContent = `✔ Terakhir disinkronkan: ${new Date().toLocaleTimeString()}`;
+        }
+        if (typeof renderFavorites === 'function' && state.currentView === 'favorites') renderFavorites();
+        if (typeof renderPlaylists === 'function' && state.currentView === 'playlists') renderPlaylists();
+        showToast('Sinkronisasi library berhasil!', 'info');
+      }
+    } catch (e) {
+      if (el.remoteClientSyncStatus) el.remoteClientSyncStatus.textContent = 'Gagal menyinkronkan library.';
+    }
+  }
+
+  // Remote Tabs
+  if (el.tabBtnHost && el.tabBtnClient) {
+    el.tabBtnHost.addEventListener('click', () => {
+      el.tabBtnHost.classList.add('active');
+      el.tabBtnClient.classList.remove('active');
+      if (el.remotePaneHost) el.remotePaneHost.classList.add('active');
+      if (el.remotePaneClient) el.remotePaneClient.classList.remove('active');
+    });
+    el.tabBtnClient.addEventListener('click', () => {
+      el.tabBtnClient.classList.add('active');
+      el.tabBtnHost.classList.remove('active');
+      if (el.remotePaneClient) el.remotePaneClient.classList.add('active');
+      if (el.remotePaneHost) el.remotePaneHost.classList.remove('active');
+      if (el.inputRemoteHostIp && state.remoteHostIp) el.inputRemoteHostIp.value = state.remoteHostIp;
+      if (el.inputRemoteHostPin && state.remoteHostPin) el.inputRemoteHostPin.value = state.remoteHostPin;
+      updateClientUIConnected(state.remoteClientMode);
+    });
+  }
+
+  if (el.btnClientConnect) {
+    el.btnClientConnect.addEventListener('click', () => {
+      const ip = el.inputRemoteHostIp ? el.inputRemoteHostIp.value : '';
+      const pin = el.inputRemoteHostPin ? el.inputRemoteHostPin.value : '';
+      connectToRemoteHost(ip, pin);
+    });
+  }
+
+  if (el.btnClientDisconnect) {
+    el.btnClientDisconnect.addEventListener('click', disconnectFromRemoteHost);
+  }
+
+  if (el.btnClientSyncNow) {
+    el.btnClientSyncNow.addEventListener('click', syncLibraryWithHost);
+  }
+
+  // Restore client mode if saved
+  if (state.remoteClientMode && state.remoteHostIp) {
+    startClientSSE();
+  }
+
+  // Push PC library to remoteServer on start
+  if (window.electronAPI && window.electronAPI.sendRemoteLibrary) {
+    window.electronAPI.sendRemoteLibrary({
+      favorites: state.favorites || [],
+      playlists: state.playlists || []
+    });
+  }
+
+
+  if (window.electronAPI && window.electronAPI.onRemoteStatusChanged) {
+    window.electronAPI.onRemoteStatusChanged((status) => updateRemoteStatusUI(status));
+  }
+
+  if (el.btnRemoteConnect) {
+    el.btnRemoteConnect.addEventListener('click', async () => {
+      if (el.remoteConnectModal) {
+        el.remoteConnectModal.classList.remove('hidden');
+        el.remoteConnectModal.classList.add('visible');
+        if (window.electronAPI && window.electronAPI.getRemoteStatus) {
+          const status = await window.electronAPI.getRemoteStatus();
+          updateRemoteStatusUI(status);
+        }
+        broadcastRemoteState(true);
+      }
+    });
+  }
+
+  if (el.btnCloseRemoteModal) {
+    el.btnCloseRemoteModal.addEventListener('click', () => {
+      if (el.remoteConnectModal) {
+        el.remoteConnectModal.classList.add('hidden');
+        el.remoteConnectModal.classList.remove('visible');
+      }
+    });
+  }
+
+  if (el.remoteConnectModal) {
+    el.remoteConnectModal.addEventListener('click', (e) => {
+      if (e.target === el.remoteConnectModal) {
+        el.remoteConnectModal.classList.add('hidden');
+        el.remoteConnectModal.classList.remove('visible');
+      }
+    });
+  }
+
+  if (el.btnCopyRemoteUrl) {
+    el.btnCopyRemoteUrl.addEventListener('click', () => {
+      if (el.remoteUrlText && el.remoteUrlText.textContent) {
+        navigator.clipboard.writeText(el.remoteUrlText.textContent).then(() => {
+          showToast('URL Synth Connect disalin!', 'info');
+        }).catch(() => {});
+      }
+    });
+  }
+
+  if (window.electronAPI && window.electronAPI.getRemoteStatus) {
+    window.electronAPI.getRemoteStatus().then((status) => updateRemoteStatusUI(status)).catch(() => {});
+  }
+
   function applyWelcomeResult(d) {
     if (!d) return;
     function setSwitch(btn, on) { if (btn && btn.classList.contains('active') !== !!on) btn.click(); }
@@ -10767,7 +11217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const btnConfirm = document.getElementById('btn-confirm-spotify-import');
       if (btnConfirm) btnConfirm.click();
     }
-    showToast('Welcome to Riff!', 'info');
+    showToast('Welcome to Synth!', 'info');
   }
   if (window.electronAPI && window.electronAPI.onWelcomeResult) window.electronAPI.onWelcomeResult((d) => applyWelcomeResult(d));
 
@@ -11072,7 +11522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast(r && r.ok === false ? 'Updates are checked only in the installed app' : 'Checking for updates...', 'info');
     });
     api.onUpdateAvailable((d) => {
-      title.textContent = 'Riff ' + d.version + ' is available';
+      title.textContent = 'Synth ' + d.version + ' is available';
       bar.classList.add('hidden'); bar.firstElementChild.style.width = '0';
       nowB.disabled = laterB.disabled = false;
       nowB.classList.toggle('hidden', !d.canInstall); laterB.classList.toggle('hidden', !d.canInstall);
@@ -11091,11 +11541,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       openModal(modal);
     });
     api.onUpdateProgress((d) => { bar.classList.remove('hidden'); bar.firstElementChild.style.width = d.percent + '%'; text.textContent = 'Downloading... ' + d.percent + '%'; });
-    api.onUpdateReady(() => { text.textContent = 'Update downloaded. It will be installed when you close Riff.'; nowB.classList.add('hidden'); laterB.classList.add('hidden'); });
+    api.onUpdateReady(() => { text.textContent = 'Update downloaded. It will be installed when you close Synth.'; nowB.classList.add('hidden'); laterB.classList.add('hidden'); });
     api.onUpdateError((d) => showToast('Update error: ' + d.message, 'error'));
     api.onUpdateNotAvailable((d) => showToast('You are on the latest version (' + d.version + ')', 'info'));
     nowB.addEventListener('click', () => { api.updateAction('now'); nowB.disabled = laterB.disabled = true; text.textContent = 'Downloading...'; });
-    laterB.addEventListener('click', () => { api.updateAction('later'); closeModal(modal); showToast('The update will be installed when you close Riff', 'info'); });
+    laterB.addEventListener('click', () => { api.updateAction('later'); closeModal(modal); showToast('The update will be installed when you close Synth', 'info'); });
     ignoreB.addEventListener('click', () => { api.updateAction('ignore'); closeModal(modal); });
     $('btn-close-update').addEventListener('click', () => closeModal(modal));
   })();
@@ -14837,7 +15287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const move = window.confirm(
         'Move your existing music to the new folder?\n\n' +
-        'OK: move all downloaded and imported files, then restart Riff.\n' +
+        'OK: move all downloaded and imported files, then restart Synth.\n' +
         'Cancel: switch to the new folder without moving (files stay in the old one).'
       );
       btnChangeMusicFolder.disabled = true;
@@ -14857,7 +15307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       btnChangeMusicFolder.textContent = 'Restarting...';
-      showToast('Restarting Riff...');
+      showToast('Restarting Synth...');
       setTimeout(() => { if (window.electronAPI.restartApp) window.electronAPI.restartApp(); }, 400);
     });
   }

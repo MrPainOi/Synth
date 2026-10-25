@@ -11,6 +11,8 @@ let lastTrackInfo = null;
 let reconnectTimer = null;
 let isDestroying = false;
 
+let hasLoggedRpcFail = false;
+
 function initRPC() {
   if (rpcClient || isDestroying) return;
 
@@ -18,6 +20,7 @@ function initRPC() {
 
   rpcClient.on('ready', () => {
     isConnected = true;
+    hasLoggedRpcFail = false;
     console.log('[Discord RPC] Connected as', rpcClient.user?.username || 'unknown');
     if (lastTrackInfo && isEnabled) {
       _setActivity(lastTrackInfo);
@@ -32,7 +35,10 @@ function initRPC() {
   });
 
   rpcClient.login({ clientId: CLIENT_ID }).catch(err => {
-    console.warn('[Discord RPC] Login failed:', err.message || err);
+    if (!hasLoggedRpcFail) {
+      console.warn('[Discord RPC] Login failed (Discord desktop might not be running):', err.message || err);
+      hasLoggedRpcFail = true;
+    }
     isConnected = false;
     rpcClient = null;
     scheduleReconnect();
