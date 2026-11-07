@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify - Pemutar Web: Musik untuk semua orang</title>
+  <meta name="description" content="Spotify adalah layanan musik digital yang memberimu akses ke jutaan lagu.">
+  <link rel="icon" href="https://open.spotifycdn.com/cdn/images/favicon32.b64eb1c1.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="top-navbar" id="top-navbar">
+    <div class="nav-center">
+      <button class="nav-home-btn" title="Beranda" id="btn-home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33A2 2 0 0 1 22 7.577V20a2 2 0 0 1-2 2h-4.5a2 2 0 0 1-2-2v-5h-3v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7.577a2 2 0 0 1 1-1.732l7.5-4.33z"/>
+        </svg>
+      </button>
+
+      <div class="search-box-pill" id="search-box-pill">
+        <span class="search-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10.533 1.278a7.5 7.5 0 1 1-4.838 12.35l-4.225 4.226a1 1 0 0 1-1.414-1.414l4.225-4.225A7.5 7.5 0 0 1 10.533 1.278zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/>
+          </svg>
+        </span>
+        <input type="text" class="search-input" id="search-input" placeholder="Apa yang ingin kamu putar?" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="icon-btn-circle" title="Yang Baru" id="btn-bell">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22zm7-6V11a7 7 0 0 0-5-6.708V3a2 2 0 0 0-4 0v1.292A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/>
+        </svg>
+      </button>
+      <button class="icon-btn-circle" title="Aktivitas Teman" id="btn-friends">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+      </button>
+      <div class="user-profile-badge" title="Profil (Ray)" id="user-badge">R</div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <main class="app-container">
+    
+    <!-- MAIN SCROLLABLE CONTENT VIEW -->
+    <main class="main-view" id="main-view">
+      <div class="ambient-glow-header"></div>
+      
+      <div class="main-content-scroll">
+        <!-- Filter chips: Semua, Musik, Playlist -->
+        <div class="filter-chips-bar" id="filter-chips-bar">
+          <button class="filter-chip active" data-filter="all">Semua</button>
+          <button class="filter-chip inactive" data-filter="music">Musik</button>
+          <button class="filter-chip inactive" data-filter="playlist">Playlist</button>
+        </div>
+
+        <!-- 2x2 Quick Cards Grid -->
+        <div class="quick-cards-grid">
+          <div class="quick-card" data-type="playlist" data-title="sleep call bareng niki" data-artist="aly" data-art="assets/rec_niki_sleep.png">
+            <div class="quick-card-art">
+              <img src="assets/rec_niki_sleep.png" alt="sleep call bareng niki">
+            </div>
+            <div class="quick-card-title">sleep call bareng niki</div>
+            <button class="quick-play-btn" title="Putar sleep call bareng niki">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-card" data-type="playlist" data-title="Mix Santai" data-artist="Spotify" data-art="assets/rec_radiohead.png">
+            <div class="quick-card-art">
+              <img src="assets/rec_radiohead.png" alt="Mix Santai">
+            </div>
+            <div class="quick-card-title">Mix Santai</div>
+            <button class="quick-play-btn" title="Putar Mix Santai">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-card" data-type="music" data-title="Taylor Swift" data-artist="Artis" data-art="assets/rec_taylor.png">
+            <div class="quick-card-art">
+              <img src="assets/rec_taylor.png" alt="Taylor Swift">
+            </div>
+            <div class="quick-card-title">Taylor Swift</div>
+            <button class="quick-play-btn" title="Putar Taylor Swift">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quick-card" data-type="playlist" data-title="∞ Aura Farming [PERFECT]" data-artist="xMÄDMÄXx" data-art="assets/rec_aura.png">
+            <div class="quick-card-art">
+              <img src="assets/rec_aura.png" alt="∞ Aura Farming [PERFECT]">
+            </div>
+            <div class="quick-card-title">∞ Aura Farming [PERFECT]</div>
+            <button class="quick-play-btn" title="Putar ∞ Aura Farming [PERFECT]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- MIDDLE SPLIT ROW: Dipilih untukmu (Left) & Dibuat Untuk Ray (Right) -->
+        <div class="middle-split-row">
+          
+          <!-- LEFT COLUMN: Dipilih untukmu -->
+          <div class="split-col-left">
+            <h2 class="section-title-compact">Dipilih untukmu</h2>
+            <div class="featured-hero-card" data-title="night pop" data-artist="Spotify" data-art="assets/night_pop.png">
+              <div class="featured-hero-art">
+                <img src="assets/night_pop.png" alt="night pop">
+              </div>
+              <div class="featured-hero-info">
+                <span class="featured-badge-type">Playlist</span>
+                <h3 class="featured-hero-title">night pop</h3>
+                <p class="featured-hero-desc">Pop for neon streets, rainy windows, and everything you still...</p>
+                <div class="featured-hero-actions">
+                  <button class="btn-hero-play" title="Putar night pop">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </button>
+                  <button class="btn-hero-add" title="Simpan ke Koleksi">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 4a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5a1 1 0 0 1 1-1z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: Dibuat Untuk Ray -->
+          <div class="split-col-right">
+            <div class="section-header-row-compact">
+              <div class="section-titles-col">
+                <span class="section-super-title">Dibuat Untuk</span>
+                <h2 class="section-main-title">Ray</h2>
+              </div>
+              <button class="section-see-all">Tampilkan semua</button>
+            </div>
+
+            <div class="cards-compact-row">
+              <!-- Card 1: Discover Weekly -->
+              <div class="music-card-compact" data-type="playlist" data-title="Discover Weekly" data-artist="Spotify" data-art="assets/ray_discover.png">
+                <div class="card-art-wrap">
+                  <img src="assets/ray_discover.png" alt="Discover Weekly">
+                  <button class="card-floating-play" title="Putar Discover Weekly">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                </div>
+                <div class="card-title-text">Discover Weekly</div>
+                <div class="card-subtext">Tempatnya hidden gem, lagu underrated, dan...</div>
+              </div>
+
+              <!-- Card 2: Daily Mix 01 -->
+              <div class="music-card-compact" data-type="playlist" data-title="Daily Mix 01" data-artist="Spotify" data-art="assets/ray_dailymix1.png">
+                <div class="card-art-wrap">
+                  <img src="assets/ray_dailymix1.png" alt="Daily Mix 01">
+                  <button class="card-floating-play" title="Putar Daily Mix 01">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                </div>
+                <div class="card-title-text">Daily Mix 01</div>
+                <div class="card-subtext">Billie Eilish, One Direction, Taylor Swift,...</div>
+              </div>
+
+              <!-- Card 3: Daily Mix 02 -->
+              <div class="music-card-compact" data-type="playlist" data-title="Daily Mix 02" data-artist="Spotify" data-art="assets/ray_dailymix2.png">
+                <div class="card-art-wrap">
+                  <img src="assets/ray_dailymix2.png" alt="Daily Mix 02">
+                  <button class="card-floating-play" title="Putar Daily Mix 02">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                </div>
+                <div class="card-title-text">Daily Mix 02</div>
+                <div class="card-subtext">Ghost Stories, Hard Driver, Coone, dan...</div>
+              </div>
+
+              <!-- Card 4: Daily Mix 03 -->
+              <div class="music-card-compact" data-type="playlist" data-title="Daily Mix 03" data-artist="Spotify" data-art="assets/ray_dailymix3.png">
+                <div class="card-art-wrap">
+                  <img src="assets/ray_dailymix3.png" alt="Daily Mix 03">
+                  <button class="card-floating-play" title="Putar Daily Mix 03">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                </div>
+                <div class="card-title-text">Daily Mix 03</div>
+                <div class="card-subtext">Parla & Pardoux, Sofa, Jiyagi, dan lainnya</div>
+              </div>
+
+              <!-- Card 5: Daily Mix 04 -->
+              <div class="music-card-compact" data-type="playlist" data-title="Daily Mix 04" data-artist="Spotify" data-art="assets/ray_dailymix4.png">
+                <div class="card-art-wrap">
+                  <img src="assets/ray_dailymix4.png" alt="Daily Mix 04">
+                  <button class="card-floating-play" title="Putar Daily Mix 04">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                </div>
+                <div class="card-title-text">Daily Mix 04</div>
+                <div class="card-subtext">Hyperbaitor, SecretAsian6, Konix, da...</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SECTION: Baru diputar -->
+        <div class="section-header-row" data-section="recent">
+          <div class="section-titles-col">
+            <h2 class="section-main-title">Baru diputar</h2>
+          </div>
+          <button class="section-see-all">Tampilkan semua</button>
+        </div>
+
+        <div class="cards-horizontal-row" data-section="recent">
+          <!-- Item 1: Mix Santai -->
+          <div class="music-card" data-type="playlist" data-title="Mix Santai" data-artist="Spotify" data-art="assets/rec_radiohead.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_radiohead.png" alt="Mix Santai">
+              <button class="card-floating-play" title="Putar Mix Santai">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">Mix Santai</div>
+            <div class="card-subtext single-line">Playlist • Spotify</div>
+          </div>
+
+          <!-- Item 2: Lagu yang Disukai -->
+          <div class="music-card" data-type="playlist" data-title="Lagu yang Disukai" data-artist="Koleksi Kamu" data-art="assets/rec_liked.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_liked.png" alt="Lagu yang Disukai">
+              <button class="card-floating-play" title="Putar Lagu yang Disukai">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">Lagu yang Disukai</div>
+            <div class="card-subtext single-line">
+              <svg class="verified-check" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              1 lagu ditambahkan
+            </div>
+          </div>
+
+          <!-- Item 3: sleep call bareng niki -->
+          <div class="music-card" data-type="playlist" data-title="sleep call bareng niki" data-artist="aly" data-art="assets/rec_niki_sleep.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_niki_sleep.png" alt="sleep call bareng niki">
+              <button class="card-floating-play" title="Putar sleep call bareng niki">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">sleep call bareng niki</div>
+            <div class="card-subtext single-line">Playlist • aly</div>
+          </div>
+
+          <!-- Item 4: Taylor Swift (Artist Round Avatar) -->
+          <div class="music-card is-artist" data-type="music" data-title="Taylor Swift" data-artist="Artis" data-art="assets/rec_taylor.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_taylor.png" alt="Taylor Swift">
+              <button class="card-floating-play" title="Putar Taylor Swift">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">Taylor Swift</div>
+            <div class="card-subtext single-line">Artis</div>
+          </div>
+
+          <!-- Item 5: NIKI (Artist Round Avatar) -->
+          <div class="music-card is-artist" data-type="music" data-title="NIKI" data-artist="Artis" data-art="assets/rec_niki.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_niki.png" alt="NIKI">
+              <button class="card-floating-play" title="Putar NIKI">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">NIKI</div>
+            <div class="card-subtext single-line">Artis</div>
+          </div>
+
+          <!-- Item 6: Midnights -->
+          <div class="music-card" data-type="music" data-title="Midnights" data-artist="Taylor Swift" data-art="assets/rec_midnights.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_midnights.png" alt="Midnights">
+              <button class="card-floating-play" title="Putar Midnights">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">Midnights</div>
+            <div class="card-subtext single-line">Album • Taylor Swift</div>
+          </div>
+
+          <!-- Item 7: ∞ Aura Farming [PERFECT] -->
+          <div class="music-card" data-type="playlist" data-title="∞ Aura Farming [PERFECT]" data-artist="xMÄDMÄXx" data-art="assets/rec_aura.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_aura.png" alt="∞ Aura Farming">
+              <button class="card-floating-play" title="Putar ∞ Aura Farming">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">∞ Aura Farming...</div>
+            <div class="card-subtext single-line">Playlist • xMÄDMÄXx</div>
+          </div>
+
+          <!-- Item 8: Meme songs -->
+          <div class="music-card" data-type="playlist" data-title="Meme songs" data-artist="Yaitsme" data-art="assets/rec_meme.png">
+            <div class="card-art-wrap">
+              <img src="assets/rec_meme.png" alt="Meme songs">
+              <button class="card-floating-play" title="Putar Meme songs">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            <div class="card-title-text">Meme songs</div>
+            <div class="card-subtext single-line">Playlist • Yaitsme</div>
+          </div>
+        </div>
+
+        <!-- SECTION: Koleksi Musik Synth (Main Backend) -->
+        <div class="section-header-row" id="section-synth-header" data-type="music">
+          <div class="section-titles-col">
+            <span class="section-super-title">Dari Backend Synth</span>
+            <h2 class="section-main-title">Koleksi Musik Kamu</h2>
+          </div>
+          <button class="section-see-all">Tampilkan semua</button>
+        </div>
+
+        <div class="cards-horizontal-row" id="synth-tracks-container" data-type="music">
+          <!-- Dynamic Synth tracks will be injected here by app.js -->
+        </div>
+
+      </div>
+    </main>
+
+  </main>
+
+  <!-- ================= BOTTOM PLAYBACK BAR ================= -->
+  <footer class="player-bar" id="player-bar">
+    
+    <!-- LEFT: Currently Playing Metadata -->
+    <div class="player-left">
+      <div class="now-playing-thumb">
+        <img src="assets/radio_thumb.png" alt="Radio" id="current-track-art">
+      </div>
+      <div class="now-playing-text">
+        <div class="now-playing-title" id="current-track-title">Radio</div>
+        <div class="now-playing-artist" id="current-track-artist">Decore</div>
+      </div>
+      <button class="btn-add-library" title="Simpan ke Koleksi Kamu" id="btn-like-track">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5a1 1 0 0 1 1-1z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- CENTER: Controls & Progress Scrubber -->
+    <div class="player-center">
+      <div class="player-controls-row">
+        <!-- Shuffle -->
+        <button class="control-btn" title="Aktifkan acak" id="btn-shuffle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+          </svg>
+        </button>
+
+        <!-- Previous -->
+        <button class="control-btn" title="Sebelumnya" id="btn-prev">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </button>
+
+        <!-- Play / Pause Main Circle -->
+        <button class="play-pause-circle-btn" title="Putar" id="btn-main-play">
+          <svg id="play-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+
+        <!-- Next -->
+        <button class="control-btn" title="Berikutnya" id="btn-next">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </button>
+
+        <!-- Repeat -->
+        <button class="control-btn" title="Aktifkan ulang" id="btn-repeat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Timeline Scrubber -->
+      <div class="player-timeline-row">
+        <span class="time-stamp" id="time-current">0:00</span>
+        <div class="timeline-bar-wrap" id="timeline-wrap">
+          <div class="timeline-track">
+            <div class="timeline-fill" id="timeline-fill"></div>
+            <div class="timeline-thumb" id="timeline-thumb"></div>
+          </div>
+        </div>
+        <span class="time-stamp" id="time-duration">4:25</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Volume & Fullscreen -->
+    <div class="player-right">
+      <!-- Volume -->
+      <button class="tool-icon-btn" title="Bisukan" id="btn-volume-icon">
+        <svg id="volume-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+      </button>
+
+      <!-- Volume Bar -->
+      <div class="volume-bar-wrap" id="volume-wrap">
+        <div class="volume-track">
+          <div class="volume-fill" id="volume-fill" style="width: 75%;"></div>
+          <div class="volume-thumb" id="volume-thumb" style="left: 75%;"></div>
+        </div>
+      </div>
+
+      <!-- Fullscreen -->
+      <button class="tool-icon-btn" title="Layar penuh" id="btn-fullscreen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        </svg>
+      </button>
+    </div>
+
+  </footer>
+
+  <!-- Subtle bottom-left URL hover tooltip matching screenshot -->
+  <div class="browser-url-tooltip" id="url-tooltip">https://open.spotify.com/intl-id/playlist/37i9dQZF1DXbcP88bYEGaU</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

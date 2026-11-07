@@ -7,6 +7,8 @@ const os = require('os');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
 const { THUMBNAILS_DIR, CACHE_DIR } = require('./platform');
+let systemVolumeModule = null;
+try { systemVolumeModule = require('./system-volume'); } catch (_) {}
 
 const DEFAULT_PORT = 38473;
 
@@ -381,6 +383,9 @@ class RemoteServer {
     }
 
     if (pathname === '/api/state' && req.method === 'GET') {
+      if (systemVolumeModule) {
+        this.currentState.volume = systemVolumeModule.getCachedSystemVolume();
+      }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify(this.currentState));
     }
@@ -397,6 +402,10 @@ class RemoteServer {
 
       this.clients.add(res);
       if (this.onStatusChange) this.getStatus().then((s) => this.onStatusChange(s));
+
+      if (systemVolumeModule) {
+        this.currentState.volume = systemVolumeModule.getCachedSystemVolume();
+      }
 
       // Immediately send current state
       res.write(`event: state\ndata: ${JSON.stringify(this.currentState)}\n\n`);
@@ -418,6 +427,14 @@ class RemoteServer {
       req.on('end', () => {
         try {
           const cmd = JSON.parse(body);
+          if (cmd && cmd.action === 'volume' && Number.isFinite(cmd.value)) {
+            const v = Math.max(0, Math.min(1, cmd.value));
+            if (systemVolumeModule) {
+              systemVolumeModule.setSystemVolume(v);
+            }
+            this.currentState.volume = v;
+            this._broadcastState();
+          }
           if (this.onCommand && cmd && typeof cmd === 'object' && cmd.action) {
             this.onCommand(cmd);
           }

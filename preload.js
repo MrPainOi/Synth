@@ -87,6 +87,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onRemoteStatusChanged: (cb) => ipcRenderer.on('remote-status-changed', (e, status) => cb(status)),
   sendRemoteLibrary: (lib) => ipcRenderer.send('remote-library-from-renderer', lib),
   onRemoteLibrarySync: (cb) => ipcRenderer.on('remote-library-sync', (e, lib) => cb(lib)),
+  setSystemVolume: (val) => ipcRenderer.invoke('set-system-volume', val),
+  getSystemVolume: () => ipcRenderer.invoke('get-system-volume'),
 });
 
 

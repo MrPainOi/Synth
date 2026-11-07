@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synth 2 - Spotify Mobile Simulator & Markup</title>
+  <link rel="icon" href="assets/spotify_logo_icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #09090c;
+      --bg-panel: #141418;
+      --border-panel: rgba(255, 255, 255, 0.08);
+      --spotify-green: #1ed760;
+      --spotify-green-hover: #1fdf64;
+      --accent-red: #ff3b30;
+      --accent-yellow: #ffcc00;
+      --accent-blue: #007aff;
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+      --phone-bezel: #1b1b22;
+      --phone-border: #2c2c36;
+      --phone-radius: 46px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(30, 215, 96, 0.07) 0%, transparent 60%),
+        radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Figtree', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP HEADER */
+    .sim-header {
+      height: 54px;
+      background-color: rgba(20, 20, 24, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .sim-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sim-logo {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .sim-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sim-badge {
+      background-color: rgba(30, 215, 96, 0.15);
+      color: var(--spotify-green);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 500px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(30, 215, 96, 0.3);
+    }
+
+    .sim-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sim-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-panel);
+    }
+
+    .sim-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-right: 4px;
+    }
+
+    select.sim-select {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select.sim-select option {
+      background-color: #1a1a20;
+      color: #ffffff;
+    }
+
+    .sim-btn {
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-panel);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .sim-btn:hover {
+      background-color: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .sim-btn.primary {
+      background-color: var(--spotify-green);
+      color: #000000;
+      font-weight: 700;
+      border-color: var(--spotify-green);
+    }
+
+    .sim-btn.primary:hover {
+      background-color: var(--spotify-green-hover);
+      transform: scale(1.02);
+    }
+
+    /* MARKUP & ANNOTATION TOOLBAR */
+    .sim-toolbar {
+      height: 44px;
+      background-color: #121216;
+      border-bottom: 1px solid var(--border-panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 90;
+      flex-shrink: 0;
+    }
+
+    .markup-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .markup-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .markup-btn:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .markup-btn.active {
+      background-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    .markup-btn.active.draw-pen {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .markup-btn.active.comment-pin-tool {
+      border-color: var(--accent-yellow);
+      color: var(--accent-yellow);
+    }
+
+    .divider-v {
+      width: 1px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 0 4px;
+    }
+
+    /* Color Swatches */
+    .color-swatches {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .swatch:hover {
+      transform: scale(1.2);
+    }
+
+    .swatch.active {
+      border-color: #ffffff;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    /* Size Selector */
+    .size-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid transparent;
+    }
+
+    .size-btn.active {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .size-dot {
+      background-color: #fff;
+      border-radius: 50%;
+    }
+
+    /* SHORTCUTS / APP QUICK TABS */
+    .sim-nav-bar {
+      height: 34px;
+      background-color: rgba(18, 18, 22, 0.6);
+      border-bottom: 1px solid var(--border-panel);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .sim-quick-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 500px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sim-quick-tab:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .sim-quick-tab.active {
+      background-color: rgba(30, 215, 96, 0.15);
+      border-color: rgba(30, 215, 96, 0.3);
+      color: var(--spotify-green);
+    }
+
+    /* MAIN STAGE */
+    .sim-stage-layout {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sim-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    /* PHONE CONTAINER */
+    .phone-wrapper {
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.25s, height 0.25s;
+      transform-origin: center center;
+    }
+
+    .phone-case {
+      background-color: var(--phone-bezel);
+      border-radius: var(--phone-radius);
+      box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 0 0 4px #121216,
+        0 24px 60px rgba(0, 0, 0, 0.8),
+        0 40px 100px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(30, 215, 96, 0.06);
+      position: relative;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .phone-btn-power {
+      position: absolute;
+      background: #2b2b36;
+      border-radius: 3px;
+      right: -3px;
+      top: 180px;
+      width: 4px;
+      height: 54px;
+    }
+
+    .phone-btn-vol-up {
+      position: absolute;
+      background: #2b2b36;
+      border-radius: 3px;
+      left: -3px;
+      top: 150px;
+      width: 4px;
+      height: 48px;
+    }
+
+    .phone-btn-vol-down {
+      position: absolute;
+      background: #2b2b36;
+      border-radius: 3px;
+      left: -3px;
+      top: 212px;
+      width: 4px;
+      height: 48px;
+    }
+
+    .phone-camera-hole {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      background-color: #050505;
+      border-radius: 50%;
+      z-index: 50;
+      box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.4), 0 0 0 1px rgba(0,0,0,0.8);
+      pointer-events: none;
+    }
+
+    .phone-screen {
+      background-color: #121212;
+      border-radius: calc(var(--phone-radius) - 10px);
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .phone-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background-color: #121212;
+    }
+
+    /* Fullscreen mode (no frame) */
+    .phone-wrapper.mode-full {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 460px;
+    }
+
+    .phone-wrapper.mode-full .phone-case {
+      padding: 0;
+      border-radius: 0;
+      box-shadow: none;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .phone-wrapper.mode-full .phone-screen {
+      border-radius: 0;
+    }
+
+    .phone-wrapper.mode-full .phone-camera-hole,
+    .phone-wrapper.mode-full .phone-btn-power,
+    .phone-wrapper.mode-full .phone-btn-vol-up,
+    .phone-wrapper.mode-full .phone-btn-vol-down {
+      display: none;
+    }
+
+    /* ANNOTATION CANVAS & COMMENTS LAYER */
+    .annotation-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 60;
+      touch-action: none;
+    }
+
+    .annotation-canvas.active {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    .comments-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 70;
+    }
+
+    .comments-layer.active {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* Comment Pin Badge */
+    .comment-pin {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 0 2px #ffffff;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+      z-index: 75;
+      animation: pinPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pinPulse {
+      0%, 100% { box-shadow: 0 4px 12px rgba(0,0,0,0.7), 0 0 0 2px #ffffff; }
+      50% { box-shadow: 0 4px 16px rgba(255,59,48,0.8), 0 0 0 4px #ffffff; }
+    }
+
+    .comment-pin:hover,
+    .comment-pin.selected {
+      transform: translate(-50%, -50%) scale(1.2);
+      background-color: var(--spotify-green);
+      color: #000000;
+    }
+
+    /* Comment Popover */
+    .comment-popover {
+      position: absolute;
+      z-index: 85;
+      width: 260px;
+      background-color: #24242c;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: popIn 0.15s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .comment-popover-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .comment-popover textarea {
+      width: 100%;
+      height: 70px;
+      background-color: #16161c;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+    }
+
+    .comment-popover textarea:focus {
+      border-color: var(--spotify-green);
+    }
+
+    .comment-popover-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .btn-pop-del {
+      background: transparent;
+      border: none;
+      color: #ff5555;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .btn-pop-save {
+      background: var(--spotify-green);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* REVISION SIDE DRAWER */
+    .revision-drawer {
+      width: 340px;
+      background-color: #141418;
+      border-left: 1px solid var(--border-panel);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 95;
+      transition: transform 0.25s ease;
+    }
+
+    .revision-drawer.collapsed {
+      margin-right: -340px;
+      transform: translateX(100%);
+    }
+
+    .drawer-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .comment-count-badge {
+      background-color: var(--accent-red);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 500px;
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comment-card {
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .comment-card:hover,
+    .comment-card.active {
+      background-color: rgba(255, 255, 255, 0.09);
+      border-color: rgba(30, 215, 96, 0.4);
+    }
+
+    .comment-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .comment-card-num {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--spotify-green);
+    }
+
+    .comment-card-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .comment-card-del {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .comment-card-del:hover {
+      color: #ff5555;
+    }
+
+    .comment-card-text {
+      font-size: 13px;
+      color: #ffffff;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .comment-empty-msg {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 40px 10px;
+      line-height: 1.5;
+    }
+
+    .drawer-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border-panel);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-submit-ai {
+      background-color: var(--spotify-green);
+      color: #000000;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-submit-ai:hover {
+      background-color: var(--spotify-green-hover);
+      transform: scale(1.02);
+    }
+
+    .btn-copy-notes {
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-panel);
+      color: var(--text-main);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-copy-notes:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* TOAST NOTIFICATION */
+    .sim-toast {
+      position: fixed;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background-color: #1ed760;
+      color: #000000;
+      padding: 10px 20px;
+      border-radius: 500px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .sim-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* FOOTER STATUS BAR */
+    .sim-footer {
+      height: 30px;
+      background-color: #0c0c0f;
+      border-top: 1px solid var(--border-panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--spotify-green);
+      display: inline-block;
+      box-shadow: 0 0 6px var(--spotify-green);
+    }
+
+    kbd {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      padding: 1px 4px;
+      font-size: 10px;
+      font-family: inherit;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="sim-header">
+    <div class="sim-brand">
+      <img src="assets/spotify_logo_icon.png" class="sim-logo" alt="Spotify">
+      <span class="sim-title">Synth 2 <span class="sim-badge">Mobile Simulator & Markup</span></span>
+    </div>
+
+    <div class="sim-controls">
+      <!-- Device Preset -->
+      <div class="sim-group">
+        <span class="sim-label">Perangkat:</span>
+        <select class="sim-select" id="device-select">
+          <option value="poco" selected>Xiaomi / POCO (412 × 915) - Asli HP Anda</option>
+          <option value="iphone15">iPhone 15 Pro (393 × 852)</option>
+          <option value="galaxy">Samsung Galaxy S24 (360 × 800)</option>
+          <option value="compact">Android Ringkas (360 × 740)</option>
+          <option value="fullscreen">Responsif Penuh (Tanpa Frame HP)</option>
+        </select>
+      </div>
+
+      <!-- Scale / Zoom -->
+      <div class="sim-group">
+        <span class="sim-label">Zoom:</span>
+        <select class="sim-select" id="zoom-select">
+          <option value="fit" selected>Otomatis (Fit Layar)</option>
+          <option value="1.0">100%</option>
+          <option value="0.9">90%</option>
+          <option value="0.8">80%</option>
+          <option value="0.75">75%</option>
+        </select>
+      </div>
+
+      <!-- Actions -->
+      <button class="sim-btn" id="btn-reload" title="Muat ulang halaman (R)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Muat Ulang
+      </button>
+
+      <button class="sim-btn primary" id="btn-open-standalone" title="Buka tampilan mobile langsung di tab baru">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Tab Mandiri
+      </button>
+    </div>
+  </header>
+
+  <!-- MARKUP & ANNOTATION TOOLBAR -->
+  <div class="sim-toolbar">
+    <div class="markup-tools">
+      <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-right: 4px;">ALAT REVISI:</span>
+      
+      <!-- 1. Interact Pointer -->
+      <button class="markup-btn active" id="tool-interact" title="Interaksi normal dengan aplikasi (klik, scroll, putar lagu)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 2l3 9 5-3-3 10-4-3-4 4V2z"/></svg>
+        Interaksi
+      </button>
+
+      <!-- 2. Freehand Pen / Coret -->
+      <button class="markup-btn draw-pen" id="tool-draw" title="Coret / gambar bebas pada layar untuk tandai area">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        Coret Bebas
+      </button>
+
+      <!-- 3. Rectangle / Box -->
+      <button class="markup-btn" id="tool-rect" title="Gambar kotak pembatas untuk menyorot elemen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        Kotak
+      </button>
+
+      <!-- 4. Comment Pin / Komen -->
+      <button class="markup-btn comment-pin-tool" id="tool-comment" title="Klik di mana saja pada layar untuk letakkan pin catatan revisi">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+        Tambah Komen
+      </button>
+
+      <div class="divider-v"></div>
+
+      <!-- Color Swatches -->
+      <div class="color-swatches">
+        <div class="swatch active" data-color="#ff3b30" style="background-color: #ff3b30;" title="Merah (Bug / Revisi)"></div>
+        <div class="swatch" data-color="#ffcc00" style="background-color: #ffcc00;" title="Kuning (Perhatian)"></div>
+        <div class="swatch" data-color="#1ed760" style="background-color: #1ed760;" title="Hijau (Spotify)"></div>
+        <div class="swatch" data-color="#007aff" style="background-color: #007aff;" title="Biru"></div>
+        <div class="swatch" data-color="#ffffff" style="background-color: #ffffff;" title="Putih"></div>
+      </div>
+
+      <div class="divider-v"></div>
+
+      <!-- Stroke Size -->
+      <div style="display: flex; gap: 4px; align-items: center;">
+        <div class="size-btn" data-size="3" title="Tipis"><div class="size-dot" style="width: 4px; height: 4px;"></div></div>
+        <div class="size-btn active" data-size="6" title="Sedang"><div class="size-dot" style="width: 7px; height: 7px;"></div></div>
+        <div class="size-btn" data-size="14" title="Tebal / Stabilo"><div class="size-dot" style="width: 12px; height: 12px;"></div></div>
+      </div>
+
+      <div class="divider-v"></div>
+
+      <!-- Undo & Clear -->
+      <button class="markup-btn" id="btn-undo" title="Urungkan coretan terakhir (Ctrl+Z)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+        Urungkan
+      </button>
+
+      <button class="markup-btn" id="btn-clear" title="Bersihkan semua coretan dan pin">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
+        Hapus Semua
+      </button>
+    </div>
+
+    <!-- Right: Drawer Toggle -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="sim-btn" id="btn-toggle-drawer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Daftar Catatan (<span id="btn-comment-count">0</span>)
+      </button>
+    </div>
+  </div>
+
+  <!-- QUICK NAVIGATION BAR -->
+  <nav class="sim-nav-bar">
+    <span style="font-size: 11px; color: var(--text-muted); font-weight: 700; margin-right: 6px;">LOMPAT CEPAT:</span>
+    <button class="sim-quick-tab active" data-nav="home">🏠 Beranda</button>
+    <button class="sim-quick-tab" data-nav="search">🔍 Cari</button>
+    <button class="sim-quick-tab" data-nav="library">📚 Koleksi Kamu</button>
+    <button class="sim-quick-tab" data-nav="queue">📋 Antrean</button>
+    <button class="sim-quick-tab" data-nav="lyrics">🎤 Lirik / Full Player</button>
+    <span style="width: 1px; height: 14px; background: rgba(255,255,255,0.1); margin: 0 4px;"></span>
+    <button class="sim-quick-tab" id="btn-test-play" style="color: var(--spotify-green);">▶ Putar Lagu Pertama</button>
+  </nav>
+
+  <!-- STAGE & REVISION DRAWER LAYOUT -->
+  <div class="sim-stage-layout">
+    <!-- STAGE / PHONE CANVAS -->
+    <main class="sim-stage" id="sim-stage">
+      <div class="phone-wrapper" id="phone-wrapper">
+        <div class="phone-btn-power"></div>
+        <div class="phone-btn-vol-up"></div>
+        <div class="phone-btn-vol-down"></div>
+
+        <div class="phone-case" id="phone-case">
+          <div class="phone-camera-hole"></div>
+          
+          <div class="phone-screen" id="phone-screen">
+            <!-- App Iframe -->
+            <iframe 
+              src="index.html?device=mobile&v=50" 
+              class="phone-iframe" 
+              id="mobile-frame" 
+              title="Synth 2 Mobile App"
+              allow="autoplay; encrypted-media">
+            </iframe>
+
+            <!-- Annotation Drawing Canvas -->
+            <canvas id="annotation-canvas" class="annotation-canvas"></canvas>
+
+            <!-- Comments Pins Layer -->
+            <div id="comments-layer" class="comments-layer"></div>
+
+            <!-- Popover for typing comment note -->
+            <div id="comment-popover" class="comment-popover" style="display: none;">
+              <div class="comment-popover-title">
+                <span id="popover-pin-title">Catatan Revisi #1</span>
+                <span style="font-size: 11px; color: var(--text-muted);">Tekan Esc batal</span>
+              </div>
+              <textarea id="popover-textarea" placeholder="Tulis apa yang perlu diperbaiki pada bagian ini..."></textarea>
+              <div class="comment-popover-actions">
+                <button type="button" class="btn-pop-del" id="btn-popover-delete">Hapus Pin</button>
+                <button type="button" class="btn-pop-save" id="btn-popover-save">Simpan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- REVISION DRAWER / SIDEBAR -->
+    <aside class="revision-drawer" id="revision-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <span>Daftar Catatan Revisi</span>
+          <span class="comment-count-badge" id="drawer-count-badge">0</span>
+        </div>
+        <button class="sim-btn" id="btn-close-drawer" style="padding: 4px 8px;">✕</button>
+      </div>
+
+      <div class="drawer-body" id="drawer-body">
+        <div class="comment-empty-msg" id="drawer-empty-msg">
+          Belum ada catatan revisi.<br><br>
+          Gunakan tombol <b>"Coret Bebas"</b> untuk melingkari tampilan atau <b>"Tambah Komen"</b> lalu klik bagian layar yang ingin Anda beri instruksi perbaikan!
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="btn-submit-ai" id="btn-send-ai" title="Kirim catatan dan coretan ke server agar AI dapat membaca langsung">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Kirim Catatan ke AI
+        </button>
+
+        <button class="btn-copy-notes" id="btn-copy-notes" title="Salin semua catatan dalam format teks untuk ditempel di obrolan">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Salin Catatan ke Clipboard
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="sim-toast" id="sim-toast">Pesan notifikasi</div>
+
+  <!-- FOOTER STATUS BAR -->
+  <footer class="sim-footer">
+    <div class="footer-left">
+      <span><span class="status-dot"></span> Server Lokal: <b style="color: #fff;">http://127.0.0.1:3030</b></span>
+      <span id="spec-info" style="margin-left: 12px;">Ukuran: <b>412 × 915 px</b> (Aspect ~20:9)</span>
+    </div>
+    <div class="footer-right">
+      <span>Pintasan: <kbd>1</kbd> Beranda &nbsp;<kbd>2</kbd> Cari &nbsp;<kbd>3</kbd> Koleksi &nbsp;<kbd>C</kbd> Coret &nbsp;<kbd>K</kbd> Komen &nbsp;<kbd>I</kbd> Interaksi &nbsp;<kbd>Spasi</kbd> Putar</span>
+    </div>
+  </footer>
+
+  <script>
+    // Elements
+    const frame = document.getElementById('mobile-frame');
+    const phoneWrapper = document.getElementById('phone-wrapper');
+    const phoneCase = document.getElementById('phone-case');
+    const phoneScreen = document.getElementById('phone-screen');
+    const simStage = document.getElementById('sim-stage');
+    const deviceSelect = document.getElementById('device-select');
+    const zoomSelect = document.getElementById('zoom-select');
+    const specInfo = document.getElementById('spec-info');
+    const btnReload = document.getElementById('btn-reload');
+    const btnStandalone = document.getElementById('btn-open-standalone');
+    const btnTestPlay = document.getElementById('btn-test-play');
+    const quickTabs = document.querySelectorAll('.sim-quick-tab[data-nav]');
+
+    // Markup Elements
+    const canvas = document.getElementById('annotation-canvas');
+    const ctx = canvas.getContext('2d');
+    const commentsLayer = document.getElementById('comments-layer');
+    const commentPopover = document.getElementById('comment-popover');
+    const popoverTitle = document.getElementById('popover-pin-title');
+    const popoverText = document.getElementById('popover-textarea');
+    const btnPopSave = document.getElementById('btn-popover-save');
+    const btnPopDelete = document.getElementById('btn-popover-delete');
+
+    const toolInteract = document.getElementById('tool-interact');
+    const toolDraw = document.getElementById('tool-draw');
+    const toolRect = document.getElementById('tool-rect');
+    const toolComment = document.getElementById('tool-comment');
+    const btnUndo = document.getElementById('btn-undo');
+    const btnClear = document.getElementById('btn-clear');
+    const swatches = document.querySelectorAll('.swatch');
+    const sizeBtns = document.querySelectorAll('.size-btn');
+
+    const drawer = document.getElementById('revision-drawer');
+    const btnToggleDrawer = document.getElementById('btn-toggle-drawer');
+    const btnCloseDrawer = document.getElementById('btn-close-drawer');
+    const drawerBody = document.getElementById('drawer-body');
+    const drawerEmptyMsg = document.getElementById('drawer-empty-msg');
+    const btnCommentCount = document.getElementById('btn-comment-count');
+    const drawerCountBadge = document.getElementById('drawer-count-badge');
+    const btnSendAi = document.getElementById('btn-send-ai');
+    const btnCopyNotes = document.getElementById('btn-copy-notes');
+    const toast = document.getElementById('sim-toast');
+
+    // State
+    const DEVICES = {
+      poco: { width: 412, height: 915, name: 'Xiaomi / POCO', ratio: '~20:9', radius: '46px' },
+      iphone15: { width: 393, height: 852, name: 'iPhone 15 Pro', ratio: '19.5:9', radius: '50px' },
+      galaxy: { width: 360, height: 800, name: 'Samsung Galaxy S24', ratio: '20:9', radius: '42px' },
+      compact: { width: 360, height: 740, name: 'Android Ringkas', ratio: '18.5:9', radius: '38px' },
+      fullscreen: { width: '100%', height: '100%', name: 'Responsif Bebas', ratio: 'Responsif', radius: '0px' }
+    };
+
+    let currentDevice = 'poco';
+    let currentScale = 1;
+
+    let activeTool = 'interact'; // 'interact', 'draw', 'rect', 'comment'
+    let strokeColor = '#ff3b30';
+    let strokeSize = 6;
+
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentPath = [];
+    let drawHistory = []; // array of actions for undo: { type: 'path'|'rect', points, color, size }
+    let comments = []; // array of { id, number, x, y, text }
+    let activePinId = null;
+
+    // Toast
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // Apply Device
+    function applyDevice(devKey) {
+      currentDevice = devKey;
+      const dev = DEVICES[devKey];
+      if (!dev) return;
+
+      if (devKey === 'fullscreen') {
+        phoneWrapper.classList.add('mode-full');
+        phoneWrapper.style.width = '100%';
+        phoneWrapper.style.height = '100%';
+        phoneCase.style.width = '100%';
+        phoneCase.style.height = '100%';
+        phoneScreen.style.width = '100%';
+        phoneScreen.style.height = '100%';
+        phoneWrapper.style.transform = 'none';
+        specInfo.innerHTML = `Ukuran: <b>Responsif Penuh</b> (Tanpa Frame)`;
+        resizeCanvas();
+        return;
+      }
+
+      phoneWrapper.classList.remove('mode-full');
+      phoneWrapper.style.setProperty('--phone-radius', dev.radius);
+      phoneScreen.style.width = dev.width + 'px';
+      phoneScreen.style.height = dev.height + 'px';
+      phoneCase.style.width = (dev.width + 24) + 'px';
+      phoneCase.style.height = (dev.height + 24) + 'px';
+      phoneWrapper.style.width = (dev.width + 24) + 'px';
+      phoneWrapper.style.height = (dev.height + 24) + 'px';
+
+      specInfo.innerHTML = `Ukuran: <b>${dev.width} × ${dev.height} px</b> (${dev.name} • ${dev.ratio})`;
+      applyZoom();
+      resizeCanvas();
+    }
+
+    function applyZoom() {
+      if (currentDevice === 'fullscreen') {
+        currentScale = 1;
+        phoneWrapper.style.transform = 'none';
+        return;
+      }
+
+      const val = zoomSelect.value;
+      if (val === 'fit') {
+        const stageH = simStage.clientHeight - 48;
+        const phoneH = parseInt(phoneCase.style.height, 10) || 939;
+        currentScale = Math.min(1, Math.max(0.4, (stageH / phoneH)));
+        phoneWrapper.style.transform = `scale(${currentScale.toFixed(3)})`;
+      } else {
+        currentScale = parseFloat(val);
+        phoneWrapper.style.transform = `scale(${currentScale})`;
+      }
+    }
+
+    function resizeCanvas() {
+      const rect = phoneScreen.getBoundingClientRect();
+      const w = phoneScreen.clientWidth || 412;
+      const h = phoneScreen.clientHeight || 915;
+
+      canvas.width = w;
+      canvas.height = h;
+      redrawAll();
+    }
+
+    deviceSelect.addEventListener('change', () => applyDevice(deviceSelect.value));
+    zoomSelect.addEventListener('change', applyZoom);
+    window.addEventListener('resize', () => { 
+      if (zoomSelect.value === 'fit') applyZoom(); 
+      resizeCanvas();
+    });
+
+    btnReload.addEventListener('click', () => {
+      frame.src = 'index.html?device=mobile&t=' + Date.now();
+    });
+
+    btnStandalone.addEventListener('click', () => {
+      window.open('index.html?device=mobile', '_blank');
+    });
+
+    // =========================================================================
+    // TOOL SELECTION & INTERACTION MODES
+    // =========================================================================
+    function setTool(tool) {
+      activeTool = tool;
+      [toolInteract, toolDraw, toolRect, toolComment].forEach(b => b.classList.remove('active'));
+
+      if (tool === 'interact') {
+        toolInteract.classList.add('active');
+        canvas.classList.remove('active');
+        commentsLayer.classList.remove('active');
+        closeCommentPopover();
+      } else if (tool === 'draw') {
+        toolDraw.classList.add('active');
+        canvas.classList.add('active');
+        commentsLayer.classList.remove('active');
+        closeCommentPopover();
+      } else if (tool === 'rect') {
+        toolRect.classList.add('active');
+        canvas.classList.add('active');
+        commentsLayer.classList.remove('active');
+        closeCommentPopover();
+      } else if (tool === 'comment') {
+        toolComment.classList.add('active');
+        canvas.classList.remove('active');
+        commentsLayer.classList.add('active');
+      }
+    }
+
+    toolInteract.addEventListener('click', () => setTool('interact'));
+    toolDraw.addEventListener('click', () => setTool('draw'));
+    toolRect.addEventListener('click', () => setTool('rect'));
+    toolComment.addEventListener('click', () => setTool('comment'));
+
+    // Colors
+    swatches.forEach(sw => {
+      sw.addEventListener('click', () => {
+        swatches.forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        strokeColor = sw.dataset.color;
+        if (activeTool === 'interact') setTool('draw');
+      });
+    });
+
+    // Sizes
+    sizeBtns.forEach(sb => {
+      sb.addEventListener('click', () => {
+        sizeBtns.forEach(s => s.classList.remove('active'));
+        sb.classList.add('active');
+        strokeSize = parseInt(sb.dataset.size, 10);
+        if (activeTool === 'interact') setTool('draw');
+      });
+    });
+
+    // Get pointer coordinates relative to phoneScreen (accounting for zoom scale)
+    function getPointerPos(e) {
+      const rect = phoneScreen.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const scale = currentScale || 1;
+      return {
+        x: (clientX - rect.left) / scale,
+        y: (clientY - rect.top) / scale
+      };
+    }
+
+    // =========================================================================
+    // CANVAS DRAWING (FREEHAND & RECTANGLE)
+    // =========================================================================
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', drawMove);
+    window.addEventListener('mouseup', endDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); drawMove(e); }, { passive: false });
+    window.addEventListener('touchend', endDrawing);
+
+    function startDrawing(e) {
+      if (activeTool !== 'draw' && activeTool !== 'rect') return;
+      isDrawing = true;
+      const pos = getPointerPos(e);
+      startX = pos.x;
+      startY = pos.y;
+      currentPath = [{ x: pos.x, y: pos.y }];
+    }
+
+    function drawMove(e) {
+      if (!isDrawing) return;
+      const pos = getPointerPos(e);
+
+      if (activeTool === 'draw') {
+        currentPath.push(pos);
+        redrawAll();
+        drawStrokePath(currentPath, strokeColor, strokeSize);
+      } else if (activeTool === 'rect') {
+        redrawAll();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeSize;
+        ctx.lineJoin = 'round';
+        ctx.strokeRect(startX, startY, pos.x - startX, pos.y - startY);
+      }
+    }
+
+    function endDrawing(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+
+      if (activeTool === 'draw' && currentPath.length > 1) {
+        drawHistory.push({
+          type: 'path',
+          points: currentPath,
+          color: strokeColor,
+          size: strokeSize
+        });
+      } else if (activeTool === 'rect') {
+        const pos = e.clientX ? getPointerPos(e) : { x: startX, y: startY };
+        const w = pos.x - startX;
+        const h = pos.y - startY;
+        if (Math.abs(w) > 5 || Math.abs(h) > 5) {
+          drawHistory.push({
+            type: 'rect',
+            x: startX,
+            y: startY,
+            w: w,
+            h: h,
+            color: strokeColor,
+            size: strokeSize
+          });
+        }
+      }
+      currentPath = [];
+      redrawAll();
+    }
+
+    function drawStrokePath(points, color, size) {
+      if (!points || points.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = size;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.stroke();
+    }
+
+    function redrawAll() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawHistory.forEach(item => {
+        if (item.type === 'path') {
+          drawStrokePath(item.points, item.color, item.size);
+        } else if (item.type === 'rect') {
+          ctx.strokeStyle = item.color;
+          ctx.lineWidth = item.size;
+          ctx.lineJoin = 'round';
+          ctx.strokeRect(item.x, item.y, item.w, item.h);
+        }
+      });
+    }
+
+    // Undo
+    btnUndo.addEventListener('click', () => {
+      if (drawHistory.length > 0) {
+        drawHistory.pop();
+        redrawAll();
+        showToast('Coretan terakhir diurungkan');
+      } else if (comments.length > 0) {
+        deleteComment(comments[comments.length - 1].id);
+      }
+    });
+
+    // Clear
+    btnClear.addEventListener('click', () => {
+      if (confirm('Hapus semua coretan dan pin komentar?')) {
+        drawHistory = [];
+        comments = [];
+        redrawAll();
+        renderComments();
+        closeCommentPopover();
+        showToast('Semua coretan dan pin telah dibersihkan');
+      }
+    });
+
+    // =========================================================================
+    // COMMENT PINS SYSTEM
+    // =========================================================================
+    commentsLayer.addEventListener('click', (e) => {
+      if (activeTool !== 'comment') return;
+      if (e.target.closest('.comment-pin')) return; // handled by pin click
+
+      const pos = getPointerPos(e);
+      const newId = 'pin_' + Date.now();
+      const newNum = comments.length + 1;
+
+      const newComment = {
+        id: newId,
+        number: newNum,
+        x: pos.x,
+        y: pos.y,
+        text: ''
+      };
+
+      comments.push(newComment);
+      renderComments();
+      openCommentPopover(newComment);
+
+      // Open drawer so user sees their new note
+      drawer.classList.remove('collapsed');
+    });
+
+    function renderComments() {
+      commentsLayer.innerHTML = '';
+      const w = phoneScreen.clientWidth || 412;
+      const h = phoneScreen.clientHeight || 915;
+
+      comments.forEach(c => {
+        const pin = document.createElement('div');
+        pin.className = 'comment-pin' + (activePinId === c.id ? ' selected' : '');
+        pin.style.left = c.x + 'px';
+        pin.style.top = c.y + 'px';
+        pin.textContent = c.number;
+        pin.title = `Catatan #${c.number}: ${c.text || '(Belum ada teks)'}`;
+
+        pin.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openCommentPopover(c);
+        });
+
+        commentsLayer.appendChild(pin);
+      });
+
+      // Update counters
+      const count = comments.length;
+      btnCommentCount.textContent = count;
+      drawerCountBadge.textContent = count;
+
+      // Render cards in drawer
+      renderDrawerList();
+    }
+
+    function openCommentPopover(c) {
+      activePinId = c.id;
+      popoverTitle.textContent = `Catatan Revisi #${c.number}`;
+      popoverText.value = c.text || '';
+      
+      const pinX = c.x;
+      const pinY = c.y;
+      const screenW = phoneScreen.clientWidth || 412;
+      const screenH = phoneScreen.clientHeight || 915;
+
+      let popX = pinX + 16;
+      let popY = pinY - 40;
+
+      if (popX + 260 > screenW) popX = Math.max(10, pinX - 270);
+      if (popY + 160 > screenH) popY = Math.max(10, screenH - 170);
+
+      commentPopover.style.left = popX + 'px';
+      commentPopover.style.top = popY + 'px';
+      commentPopover.style.display = 'flex';
+      popoverText.focus();
+
+      renderComments();
+    }
+
+    function closeCommentPopover() {
+      commentPopover.style.display = 'none';
+      activePinId = null;
+      renderComments();
+    }
+
+    btnPopSave.addEventListener('click', () => {
+      const c = comments.find(item => item.id === activePinId);
+      if (c) {
+        c.text = popoverText.value.trim();
+        showToast(`Catatan #${c.number} disimpan`);
+      }
+      closeCommentPopover();
+    });
+
+    btnPopDelete.addEventListener('click', () => {
+      if (activePinId) {
+        deleteComment(activePinId);
+        closeCommentPopover();
+      }
+    });
+
+    function deleteComment(id) {
+      comments = comments.filter(c => c.id !== id);
+      // Re-number remaining
+      comments.forEach((c, idx) => { c.number = idx + 1; });
+      renderComments();
+      showToast('Pin catatan dihapus');
+    }
+
+    // Drawer list
+    function renderDrawerList() {
+      drawerBody.innerHTML = '';
+      if (comments.length === 0) {
+        drawerBody.appendChild(drawerEmptyMsg);
+        return;
+      }
+
+      comments.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'comment-card' + (activePinId === c.id ? ' active' : '');
+        card.innerHTML = `
+          <div class="comment-card-top">
+            <div class="comment-card-num">
+              <span class="comment-card-badge">${c.number}</span>
+              <span>Revisi #${c.number}</span>
+            </div>
+            <button class="comment-card-del" title="Hapus catatan">✕</button>
+          </div>
+          <div class="comment-card-text">${escapeHtml(c.text || '(Klik untuk tulis catatan...)')}</div>
+        `;
+
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.comment-card-del')) {
+            deleteComment(c.id);
+            return;
+          }
+          openCommentPopover(c);
+        });
+
+        drawerBody.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Drawer Toggle
+    btnToggleDrawer.addEventListener('click', () => {
+      drawer.classList.toggle('collapsed');
+    });
+
+    btnCloseDrawer.addEventListener('click', () => {
+      drawer.classList.add('collapsed');
+    });
+
+    // =========================================================================
+    // COPY REVISION NOTES & SUBMIT TO AI API
+    // =========================================================================
+    function generateRevisionMarkdown() {
+      if (comments.length === 0 && drawHistory.length === 0) {
+        return 'Belum ada coretan atau catatan revisi.';
+      }
+
+      const dev = DEVICES[currentDevice] || DEVICES.poco;
+      let md = `### 📋 Catatan Revisi UI Mobile (${dev.name} • ${dev.width}×${dev.height})\n\n`;
+
+      if (comments.length > 0) {
+        comments.forEach(c => {
+          md += `* **[Pin #${c.number}]** (Posisi x: ${Math.round(c.x)}, y: ${Math.round(c.y)}):\n  ${c.text || 'Periksa area yang ditandai'}\n\n`;
+        });
+      }
+
+      if (drawHistory.length > 0) {
+        md += `* *Catatan:* Terdapat **${drawHistory.length} coretan / penanda visual** pada layar.\n`;
+      }
+
+      return md;
+    }
+
+    btnCopyNotes.addEventListener('click', () => {
+      const text = generateRevisionMarkdown();
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 Catatan revisi disalin! Siap ditempel ke obrolan');
+      }).catch(() => {
+        prompt('Salin teks catatan revisi berikut:', text);
+      });
+    });
+
+    // Send to AI endpoint (/api/submit-feedback)
+    btnSendAi.addEventListener('click', async () => {
+      if (comments.length === 0 && drawHistory.length === 0) {
+        showToast('Tambahkan setidaknya satu coretan atau catatan sebelum mengirim.');
+        return;
+      }
+
+      showToast('Mengirim catatan & snapshot ke AI...');
+
+      try {
+        // Merge canvas & pins into an export image
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = canvas.width;
+        exportCanvas.height = canvas.height;
+        const eCtx = exportCanvas.getContext('2d');
+
+        // Draw background phone screenshot or dark fill
+        eCtx.fillStyle = '#121212';
+        eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+        // Draw markings
+        eCtx.drawImage(canvas, 0, 0);
+
+        // Draw pin badges
+        comments.forEach(c => {
+          eCtx.beginPath();
+          eCtx.arc(c.x, c.y, 14, 0, Math.PI * 2);
+          eCtx.fillStyle = '#ff3b30';
+          eCtx.fill();
+          eCtx.lineWidth = 2;
+          eCtx.strokeStyle = '#ffffff';
+          eCtx.stroke();
+
+          eCtx.fillStyle = '#ffffff';
+          eCtx.font = 'bold 12px sans-serif';
+          eCtx.textAlign = 'center';
+          eCtx.textBaseline = 'middle';
+          eCtx.fillText(String(c.number), c.x, c.y);
+        });
+
+        const dataUrl = exportCanvas.toDataURL('image/png');
+
+        const payload = {
+          timestamp: Date.now(),
+          device: currentDevice,
+          deviceName: (DEVICES[currentDevice] || {}).name,
+          screenWidth: canvas.width,
+          screenHeight: canvas.height,
+          comments: comments,
+          drawHistoryCount: drawHistory.length,
+          markdown: generateRevisionMarkdown(),
+          image: dataUrl
+        };
+
+        const res = await fetch('/api/submit-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const resData = await res.json();
+          showToast('✅ Berhasil dikirim! AI sekarang dapat melihat coretan dan catatan Anda.');
+        } else {
+          showToast('Gagal mengirim ke server. Silakan gunakan tombol Salin Catatan.');
+        }
+      } catch (err) {
+        console.warn('Submit feedback error:', err);
+        showToast('Gagal mengirim feedback: ' + err.message);
+      }
+    });
+
+    // =========================================================================
+    // QUICK NAVIGATION SHORTCUTS
+    // =========================================================================
+    function navIframe(view) {
+      quickTabs.forEach(t => t.classList.toggle('active', t.dataset.nav === view));
+      try {
+        const win = frame.contentWindow;
+        if (!win || !win.document) return;
+
+        if (view === 'home') {
+          const btn = win.document.getElementById('mob-nav-home');
+          if (btn) btn.click();
+        } else if (view === 'search') {
+          const btn = win.document.getElementById('mob-nav-search');
+          if (btn) btn.click();
+        } else if (view === 'library') {
+          const btn = win.document.getElementById('mob-nav-library');
+          if (btn) btn.click();
+        } else if (view === 'queue') {
+          const btn = win.document.getElementById('mob-nav-queue');
+          if (btn) btn.click();
+        } else if (view === 'lyrics') {
+          const pBar = win.document.getElementById('player-bar');
+          if (pBar) pBar.click();
+        }
+      } catch (e) {
+        console.warn('Iframe nav error:', e);
+      }
+    }
+
+    quickTabs.forEach(tab => {
+      tab.addEventListener('click', () => navIframe(tab.dataset.nav));
+    });
+
+    btnTestPlay.addEventListener('click', () => {
+      try {
+        const win = frame.contentWindow;
+        if (!win || !win.document) return;
+        const playBtn = win.document.getElementById('btn-main-play');
+        const firstCard = win.document.querySelector('.quick-card') || win.document.querySelector('.spotify-card');
+        if (firstCard) {
+          firstCard.click();
+        } else if (playBtn) {
+          playBtn.click();
+        }
+      } catch (e) {
+        console.warn('Test play error:', e);
+      }
+    });
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        if (e.key === 'Escape') closeCommentPopover();
+        return;
+      }
+      if (e.key === '1') navIframe('home');
+      if (e.key === '2') navIframe('search');
+      if (e.key === '3') navIframe('library');
+      if (e.key === '4') navIframe('queue');
+      if (e.key === 'c' || e.key === 'C') setTool('draw');
+      if (e.key === 'k' || e.key === 'K') setTool('comment');
+      if (e.key === 'i' || e.key === 'I') setTool('interact');
+      if (e.key === 'r' || e.key === 'R') btnReload.click();
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        btnUndo.click();
+      }
+      if (e.key === ' ') {
+        e.preventDefault();
+        try {
+          const win = frame.contentWindow;
+          const p = win?.document?.getElementById('btn-main-play');
+          if (p) p.click();
+        } catch (err) {}
+      }
+    });
+
+    // Init
+    applyDevice('poco');
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+	"appId": "io.github.cloverscripts.muriel",
+	"appName": "Synth",
+	"webDir": "www",
+	"backgroundColor": "#121214",
+	"server": {
+		"androidScheme": "http",
+		"cleartext": true
+	},
+	"ios": {
+		"contentInset": "never",
+		"scheme": "Muriel",
+		"limitsNavigationsToAppBoundDomains": false
+	},
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		}
+	}
+}

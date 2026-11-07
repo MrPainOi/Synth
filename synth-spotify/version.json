@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "name": "Synth 2 - Spotify Edition",
+  "releaseDate": "2026-11-07",
+  "minAndroidVersion": "7.0",
+  "changelog": [
+    "Volume bar HP mengendalikan Windows Master System Volume secara real-time",
+    "Sinkronisasi audio equalizer, tone, & DSP presets dua arah antara HP dan PC",
+    "Perbaikan auto-reconnection & pemutaran audio mulus tanpa restart saat terhubung",
+    "Background preloading untuk lagu berikutnya (0ms playback buffering)",
+    "Pembaruan logo aplikasi baru di seluruh platform (PC & Android)",
+    "Sistem notifikasi update otomatis terintegrasi GitHub"
+  ],
+  "downloadUrls": {
+    "android": "https://github.com/MrPainOi/Synth/releases/latest/download/Synth-Spotify.apk",
+    "androidRaw": "https://github.com/MrPainOi/Synth/raw/main/Synth-Spotify.apk",
+    "pc": "https://github.com/MrPainOi/Synth/releases/latest",
+    "releases": "https://github.com/MrPainOi/Synth/releases"
+  }
+}

@@ -300,6 +300,12 @@ function runGUI() {
     remoteServer.start(
       38473,
       (cmd) => {
+        if (cmd && cmd.action === 'volume' && Number.isFinite(cmd.value)) {
+          try {
+            const { setSystemVolume } = require('./system-volume');
+            setSystemVolume(cmd.value);
+          } catch (_) {}
+        }
         if (mainWindow && !mainWindow.isDestroyed()) {
           if (cmd && cmd.action === 'syncLibrary') {
             mainWindow.webContents.send('remote-library-sync', cmd);
@@ -371,6 +377,23 @@ function runGUI() {
       ipcMain.handle('get-gpu-compositing', () => { try { return String(app.getGPUFeatureStatus().gpu_compositing || ''); } catch (e) { return ''; } });
       ipcMain.handle('launcher-info', () => getLauncherInfo());
       ipcMain.handle('get-audio-output-info', async () => getSystemAudioOutputInfo());
+      ipcMain.handle('set-system-volume', (event, val) => {
+        try {
+          const { setSystemVolume } = require('./system-volume');
+          setSystemVolume(val);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      });
+      ipcMain.handle('get-system-volume', async () => {
+        try {
+          const { getSystemVolume } = require('./system-volume');
+          return await getSystemVolume();
+        } catch (_) {
+          return 0.5;
+        }
+      });
 
       ipcMain.handle('remote-get-status', async () => {
         const remoteServer = require('./remote-server');

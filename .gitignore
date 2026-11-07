@@ -12,3 +12,9 @@ bin/ffprobe.exe
 dev-app-update.yml
 plugins/lastfm-scrobbler.js
 test/lastfm-scrobbler.test.js
+.agents/
+synth-spotify/scratch/
+synth-spotify/android_build/
+synth-spotify/feedback/
+synth-spotify/*.png
+synth-spotify/*.keystore

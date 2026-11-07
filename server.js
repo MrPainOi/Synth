@@ -106,6 +106,17 @@ let trackMetadataIndex = {};
 try {
   if (fs.existsSync(METADATA_PATH)) {
     trackMetadataIndex = JSON.parse(fs.readFileSync(METADATA_PATH, 'utf-8'));
+    let mutated = false;
+    for (const id in trackMetadataIndex) {
+      const item = trackMetadataIndex[id];
+      if (item && (!item.thumbnail || !item.thumbnail.startsWith('http')) && /^[\w-]{11}$/.test(id)) {
+        item.thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+        mutated = true;
+      }
+    }
+    if (mutated) {
+      try { fs.writeFileSync(METADATA_PATH, JSON.stringify(trackMetadataIndex, null, 2), 'utf-8'); } catch (_) {}
+    }
   }
 } catch (e) {
   trackMetadataIndex = {};
@@ -113,9 +124,14 @@ try {
 
 function saveTrackMetadata(cleanId, meta) {
   if (!cleanId) return;
+  let thumb = (meta && meta.thumbnail) || '';
+  if ((!thumb || !thumb.startsWith('http')) && cleanId && /^[\w-]{11}$/.test(cleanId)) {
+    thumb = `https://i.ytimg.com/vi/${cleanId}/hqdefault.jpg`;
+  }
   trackMetadataIndex[cleanId] = {
     ...(trackMetadataIndex[cleanId] || {}),
     ...meta,
+    thumbnail: thumb || (trackMetadataIndex[cleanId] && trackMetadataIndex[cleanId].thumbnail) || '',
     lastPlayed: Date.now()
   };
   try {
@@ -384,7 +400,7 @@ async function searchSoundcloud(query, limit = 14) {
           url: trackUrl,
           platform: 'soundcloud'
         };
-      });
+      }).filter((u) => !(u.duration >= 28 && u.duration <= 33));
 
       if (entries.length > 0) {
         searchCache.set(cacheKey, entries);
@@ -1127,7 +1143,9 @@ function directYoutubeSearch(query, filterSpam = false) {
                 const durStr = v.lengthText?.simpleText || '0:00';
                 const durSec = parseDurationSeconds(durStr);
                 const thumbs = v.thumbnail?.thumbnails || [];
-                const thumbnail = thumbs.length > 0 ? thumbs[thumbs.length - 1].url : '';
+                let thumbnail = thumbs.length > 0 ? thumbs[thumbs.length - 1].url : '';
+                if (thumbnail && thumbnail.startsWith('//')) thumbnail = `https:${thumbnail}`;
+                if (!thumbnail && vidId) thumbnail = `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`;
 
                 if (filterSpam && isSpamOrUnofficial(title, durSec, artist)) {
                   continue;
@@ -1819,8 +1837,46 @@ async function handleStreamInfo(req, res, trackUrl, trackId, platform = 'youtube
 
   if (!streamUrl && (title || artist || trackUrl)) {
     try {
+      const q = `${artist} ${title} audio`.trim();
+      const ytArgs = [
+        '--no-config',
+        '-g',
+        '--no-warnings',
+        '--no-playlist',
+        '--no-check-certificates',
+        '--match-filter',
+        'duration > 45',
+        '--prefer-free-formats',
+        '-f',
+        'bestaudio/best',
+        '--extractor-args',
+        'youtube:player_client=android',
+        `ytsearch3:${q}`
+      ];
+      const ytRaw = await executeYtDlp(ytArgs, 15000);
+      const ytLines = ytRaw.trim().split('\n').map(l => l.trim()).filter(l => l.startsWith('http'));
+      if (ytLines.length > 0) streamUrl = ytLines[0];
+    } catch (e) {
+      try { logger.error('Stream resolve yt fallback error: ' + (title || trackUrl), e); } catch (_) {}
+    }
+  }
+
+  if (!streamUrl && (title || artist || trackUrl)) {
+    try {
       const q = `${artist} ${title}`.trim() || trackUrl;
-      const scArgs = ['--no-config', '-g', '--no-warnings', '--no-playlist', '--no-check-certificates', '--prefer-free-formats', '-f', 'bestaudio/best', `scsearch1:${q}`];
+      const scArgs = [
+        '--no-config',
+        '-g',
+        '--no-warnings',
+        '--no-playlist',
+        '--no-check-certificates',
+        '--match-filter',
+        'duration > 45',
+        '--prefer-free-formats',
+        '-f',
+        'bestaudio/best',
+        `scsearch3:${q}`
+      ];
       const scRaw = await executeYtDlp(scArgs, 15000);
       const scLines = scRaw.trim().split('\n').map(l => l.trim()).filter(l => l.startsWith('http'));
       if (scLines.length > 0) streamUrl = scLines[0];
