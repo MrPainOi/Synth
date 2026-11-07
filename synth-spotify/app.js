@@ -7072,8 +7072,8 @@ function initApp() {
           latestVersion: remoteVersion,
           changelog,
           downloadUrls: downloadUrls || {
-            android: `${GITHUB_REPO_URL}/releases/latest/download/Synth-Spotify.apk`,
-            androidRaw: `${GITHUB_REPO_URL}/raw/main/Synth-Spotify.apk`,
+            android: `https://raw.githubusercontent.com/${GITHUB_REPO}/main/Synth-Spotify.apk`,
+            androidRaw: `https://raw.githubusercontent.com/${GITHUB_REPO}/main/Synth-Spotify.apk`,
             pc: `${GITHUB_REPO_URL}/releases/latest`,
             releases: `${GITHUB_REPO_URL}/releases`
           }
@@ -7103,11 +7103,22 @@ function initApp() {
   function handleUpdateAction() {
     if (!activeUpdateInfo) return;
     const urls = activeUpdateInfo.downloadUrls || {};
-    let targetUrl = (isNativeAndroid || isPhone)
-      ? (urls.android || urls.androidRaw || `${GITHUB_REPO_URL}/raw/main/Synth-Spotify.apk`)
-      : (urls.pc || urls.releases || `${GITHUB_REPO_URL}/releases/latest`);
+    let targetUrl = '';
 
-    showToast('Membuka tautan unduhan pembaruan...', true);
+    if (isNativeAndroid || isPhone) {
+      // Direct raw Git download for APK avoids 404 from missing GitHub Release assets
+      if (urls.android && !urls.android.includes('/releases/latest/download/')) {
+        targetUrl = urls.android;
+      } else if (urls.androidRaw) {
+        targetUrl = urls.androidRaw;
+      } else {
+        targetUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/Synth-Spotify.apk`;
+      }
+    } else {
+      targetUrl = urls.pc || urls.releases || `${GITHUB_REPO_URL}/releases/latest`;
+    }
+
+    showToast('Mengunduh pembaruan APK...', true);
 
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
       try {

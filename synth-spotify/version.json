@@ -12,8 +12,8 @@
     "Sistem notifikasi update otomatis terintegrasi GitHub"
   ],
   "downloadUrls": {
-    "android": "https://github.com/MrPainOi/Synth/releases/latest/download/Synth-Spotify.apk",
-    "androidRaw": "https://github.com/MrPainOi/Synth/raw/main/Synth-Spotify.apk",
+    "android": "https://raw.githubusercontent.com/MrPainOi/Synth/main/Synth-Spotify.apk",
+    "androidRaw": "https://raw.githubusercontent.com/MrPainOi/Synth/main/Synth-Spotify.apk",
     "pc": "https://github.com/MrPainOi/Synth/releases/latest",
     "releases": "https://github.com/MrPainOi/Synth/releases"
   }
