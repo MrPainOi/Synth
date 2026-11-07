@@ -37,17 +37,18 @@ sv.getSystemVolume().then(initialVol => {
   assert(appContent.includes('setSystemVolume'), 'app.js must call setSystemVolume');
   console.log('✔ 6. PC desktop app.js controls Windows master volume instead of app volume');
 
-  // 7. Verify version.json is 1.0.0
+  // 7. Verify version.json is 2.0.0
   const versionPkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8'));
   const versionRoot = JSON.parse(fs.readFileSync(path.join(__dirname, '../../version.json'), 'utf8'));
   const versionMobile = JSON.parse(fs.readFileSync(path.join(__dirname, '../version.json'), 'utf8'));
-  assert.strictEqual(versionPkg.version, '1.0.0', 'package.json version must be 1.0.0');
-  assert.strictEqual(versionRoot.version, '1.0.0', 'version.json version must be 1.0.0');
-  assert.strictEqual(versionMobile.version, '1.0.0', 'synth-spotify/version.json version must be 1.0.0');
-  console.log('✔ 7. All version descriptors set to 1.0.0');
+  assert.strictEqual(versionPkg.version, '2.0.0', 'package.json version must be 2.0.0');
+  assert.strictEqual(versionRoot.version, '2.0.0', 'version.json version must be 2.0.0');
+  assert.strictEqual(versionMobile.version, '2.0.0', 'synth-spotify/version.json version must be 2.0.0');
+  console.log('✔ 7. All version descriptors set to 2.0.0');
 
-  console.log('\n🎉 ALL SYSTEM VOLUME AND VERSION 1.0 CHECKS PASSED!\n');
+  console.log('\n🎉 ALL SYSTEM VOLUME AND VERSION 2.0 CHECKS PASSED!\n');
 }).catch(err => {
   console.error('Test error:', err);
   process.exit(1);
 });
+

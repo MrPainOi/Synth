@@ -6924,7 +6924,7 @@ function initApp() {
   // =========================================================================
   // APPLICATION UPDATE SYSTEM (PC & Mobile Startup Background Check)
   // =========================================================================
-  const CURRENT_APP_VERSION = '1.0.0';
+  const CURRENT_APP_VERSION = '2.0.0';
   const GITHUB_REPO = 'MrPainOi/Synth';
   const GITHUB_REPO_URL = `https://github.com/${GITHUB_REPO}`;
   const UPDATE_VERSION_JSON_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/version.json`;

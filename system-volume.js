@@ -99,3 +99,4 @@ module.exports = {
   setSystemVolume,
   getCachedSystemVolume: () => cachedSystemVolume
 };
+
