@@ -243,6 +243,13 @@ with zipfile.ZipFile(output, 'w') as zf:
   fs.copyFileSync(ALIGNED_APK, FINAL_APK_SPOTIFY);
   fs.copyFileSync(ALIGNED_APK, FINAL_APK_ROOT);
 
+  // 12. Cleanup Temporary Build Staging Artifacts
+  logStep('Purging temporary build staging artifacts...');
+  if (fs.existsSync(BUILD_DIR)) {
+    fs.rmSync(BUILD_DIR, { recursive: true, force: true });
+    console.log('  ✔ Temporary staging directory cleaned up.');
+  }
+
   const stats = fs.statSync(FINAL_APK_SPOTIFY);
   const sha256 = crypto.createHash('sha256').update(fs.readFileSync(FINAL_APK_SPOTIFY)).digest('hex');
 

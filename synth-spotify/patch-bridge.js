@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcPath = path.join(__dirname, 'assets', 'public', 'mobile-bridge.js');
+const srcPath = fs.existsSync(path.join(__dirname, 'assets', 'public', 'mobile-bridge.js'))
+  ? path.join(__dirname, 'assets', 'public', 'mobile-bridge.js')
+  : path.join(__dirname, 'mobile-bridge.js');
 let code = fs.readFileSync(srcPath, 'utf8');
 
 // 1. Patch window.fetch to normalize /api/ requests to Ob (http://127.0.0.1:38472/)
